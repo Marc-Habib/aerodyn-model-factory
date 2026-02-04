@@ -1,0 +1,434 @@
+{
+  "_description": "AeroDyn Systems - Causal Relations. Defines how stocks influence each other. Full names included for clarity.",
+  
+  "relations": [
+    {
+      "id": "surv_to_target",
+      "source": "S",
+      "source_name": "Surveillance Coverage",
+      "target": "T",
+      "target_name": "Targeting Capability",
+      "coefficient": 0.6,
+      "param_key": "surveillance_to_targeting",
+      "type": "positive",
+      "description": "Surveillance Coverage improves Targeting Capability through better situational awareness"
+    },
+    {
+      "id": "res_to_target",
+      "source": "R",
+      "source_name": "Resource Capacity",
+      "target": "T",
+      "target_name": "Targeting Capability",
+      "coefficient": 0.2,
+      "type": "positive",
+      "description": "Resource Capacity enables Targeting Capability development"
+    },
+    {
+      "id": "int_to_target",
+      "source": "I",
+      "source_name": "System Integration",
+      "target": "T",
+      "target_name": "Targeting Capability",
+      "coefficient": 0.15,
+      "type": "positive",
+      "description": "System Integration improves Targeting Capability through data fusion"
+    },
+    {
+      "id": "data_to_target",
+      "source": "Q",
+      "source_name": "Data Quality",
+      "target": "T",
+      "target_name": "Targeting Capability",
+      "coefficient": 0.4,
+      "param_key": "data_to_capability",
+      "type": "positive",
+      "description": "Data Quality directly improves Targeting Capability (AI model performance)"
+    },
+    {
+      "id": "ethics_constrains_target",
+      "source": "E",
+      "source_name": "Ethics Compliance",
+      "target": "T",
+      "target_name": "Targeting Capability",
+      "coefficient": -0.3,
+      "param_key": "ethics_constraint",
+      "transform": "invert",
+      "type": "negative",
+      "description": "Low Ethics Compliance constrains Targeting Capability (political limits)"
+    },
+    {
+      "id": "res_to_surv",
+      "source": "R",
+      "source_name": "Resource Capacity",
+      "target": "S",
+      "target_name": "Surveillance Coverage",
+      "coefficient": 0.4,
+      "type": "positive",
+      "description": "Resource Capacity enables Surveillance Coverage expansion"
+    },
+    {
+      "id": "int_to_surv",
+      "source": "I",
+      "source_name": "System Integration",
+      "target": "S",
+      "target_name": "Surveillance Coverage",
+      "coefficient": 0.25,
+      "type": "positive",
+      "description": "System Integration improves Surveillance Coverage through sensor fusion"
+    },
+    {
+      "id": "target_to_surv",
+      "source": "T",
+      "source_name": "Targeting Capability",
+      "target": "S",
+      "target_name": "Surveillance Coverage",
+      "coefficient": 0.15,
+      "type": "positive",
+      "description": "Targeting Capability feedback improves Surveillance Coverage allocation"
+    },
+    {
+      "id": "data_to_surv",
+      "source": "Q",
+      "source_name": "Data Quality",
+      "target": "S",
+      "target_name": "Surveillance Coverage",
+      "coefficient": 0.4,
+      "param_key": "data_to_capability",
+      "type": "positive",
+      "description": "Data Quality improves Surveillance Coverage effectiveness"
+    },
+    {
+      "id": "target_to_decision",
+      "source": "T",
+      "source_name": "Targeting Capability",
+      "target": "D",
+      "target_name": "Decision Support Quality",
+      "coefficient": 0.5,
+      "param_key": "targeting_to_decision",
+      "type": "positive",
+      "description": "Targeting Capability improves Decision Support Quality"
+    },
+    {
+      "id": "surv_to_decision",
+      "source": "S",
+      "source_name": "Surveillance Coverage",
+      "target": "D",
+      "target_name": "Decision Support Quality",
+      "coefficient": 0.25,
+      "type": "positive",
+      "description": "Surveillance Coverage improves Decision Support Quality"
+    },
+    {
+      "id": "ethics_to_decision",
+      "source": "E",
+      "source_name": "Ethics Compliance",
+      "target": "D",
+      "target_name": "Decision Support Quality",
+      "coefficient": 0.2,
+      "type": "positive",
+      "description": "Ethics Compliance improves Decision Support Quality (operator trust)"
+    },
+    {
+      "id": "vv_to_decision",
+      "source": "V",
+      "source_name": "V&V Maturity",
+      "target": "D",
+      "target_name": "Decision Support Quality",
+      "coefficient": 0.15,
+      "type": "positive",
+      "description": "V&V Maturity improves Decision Support Quality (reliability confidence)"
+    },
+    {
+      "id": "scrutiny_to_ethics",
+      "source": null,
+      "source_name": "External",
+      "target": "E",
+      "target_name": "Ethics Compliance",
+      "coefficient": 1.0,
+      "param_key": "political_scrutiny",
+      "type": "positive",
+      "description": "Political scrutiny drives Ethics Compliance"
+    },
+    {
+      "id": "res_to_ethics",
+      "source": "R",
+      "source_name": "Resource Capacity",
+      "target": "E",
+      "target_name": "Ethics Compliance",
+      "coefficient": 0.25,
+      "type": "positive",
+      "description": "Resource Capacity enables Ethics Compliance (compliance costs money)"
+    },
+    {
+      "id": "vv_to_ethics",
+      "source": "V",
+      "source_name": "V&V Maturity",
+      "target": "E",
+      "target_name": "Ethics Compliance",
+      "coefficient": 0.3,
+      "type": "positive",
+      "description": "V&V Maturity supports Ethics Compliance (evidence of due diligence)"
+    },
+    {
+      "id": "incidents_to_ethics",
+      "source": "X",
+      "source_name": "Incident Accumulation",
+      "target": "E",
+      "target_name": "Ethics Compliance",
+      "coefficient": 0.2,
+      "type": "positive",
+      "description": "Incident Accumulation increases pressure for Ethics Compliance"
+    },
+    {
+      "id": "target_scrutiny",
+      "source": "T",
+      "source_name": "Targeting Capability",
+      "target": "E",
+      "target_name": "Ethics Compliance",
+      "coefficient": -0.15,
+      "type": "negative",
+      "description": "Aggressive Targeting Capability draws scrutiny (negative feedback)"
+    },
+    {
+      "id": "trust_to_res",
+      "source": "L",
+      "source_name": "Legitimacy & Trust",
+      "target": "R",
+      "target_name": "Resource Capacity",
+      "coefficient": 0.4,
+      "param_key": "trust_to_resources",
+      "type": "positive",
+      "description": "Legitimacy & Trust drives procurement (Resource Capacity)"
+    },
+    {
+      "id": "int_to_res",
+      "source": "I",
+      "source_name": "System Integration",
+      "target": "R",
+      "target_name": "Resource Capacity",
+      "coefficient": 0.15,
+      "type": "positive",
+      "description": "System Integration improves Resource Capacity efficiency"
+    },
+    {
+      "id": "ethics_cost",
+      "source": "E",
+      "source_name": "Ethics Compliance",
+      "target": "R",
+      "target_name": "Resource Capacity",
+      "coefficient": -0.1,
+      "transform": "invert",
+      "type": "negative",
+      "description": "Ethics violations cost Resource Capacity (fines, remediation)"
+    },
+    {
+      "id": "vv_cost",
+      "source": "V",
+      "source_name": "V&V Maturity",
+      "target": "R",
+      "target_name": "Resource Capacity",
+      "coefficient": -0.3,
+      "param_key": "vv_investment",
+      "type": "negative",
+      "description": "V&V Maturity investment costs Resource Capacity"
+    },
+    {
+      "id": "target_to_int",
+      "source": "T",
+      "source_name": "Targeting Capability",
+      "target": "I",
+      "target_name": "System Integration",
+      "coefficient": 0.12,
+      "type": "positive",
+      "description": "Targeting Capability improves System Integration"
+    },
+    {
+      "id": "surv_to_int",
+      "source": "S",
+      "source_name": "Surveillance Coverage",
+      "target": "I",
+      "target_name": "System Integration",
+      "coefficient": 0.12,
+      "type": "positive",
+      "description": "Surveillance Coverage improves System Integration"
+    },
+    {
+      "id": "decision_to_int",
+      "source": "D",
+      "source_name": "Decision Support Quality",
+      "target": "I",
+      "target_name": "System Integration",
+      "coefficient": 0.1,
+      "type": "positive",
+      "description": "Decision Support Quality improves System Integration"
+    },
+    {
+      "id": "data_to_int",
+      "source": "Q",
+      "source_name": "Data Quality",
+      "target": "I",
+      "target_name": "System Integration",
+      "coefficient": 0.1,
+      "type": "positive",
+      "description": "Data Quality improves System Integration (data pipelines)"
+    },
+    {
+      "id": "export_control",
+      "source": null,
+      "source_name": "External",
+      "target": "I",
+      "target_name": "System Integration",
+      "coefficient": -0.1,
+      "param_key": "export_control_pressure",
+      "type": "negative",
+      "description": "Export control pressure slows System Integration"
+    },
+    {
+      "id": "ethics_to_trust",
+      "source": "E",
+      "source_name": "Ethics Compliance",
+      "target": "L",
+      "target_name": "Legitimacy & Trust",
+      "coefficient": 0.25,
+      "type": "positive",
+      "description": "Ethics Compliance builds Legitimacy & Trust"
+    },
+    {
+      "id": "vv_to_trust",
+      "source": "V",
+      "source_name": "V&V Maturity",
+      "target": "L",
+      "target_name": "Legitimacy & Trust",
+      "coefficient": 0.2,
+      "type": "positive",
+      "description": "V&V Maturity builds Legitimacy & Trust"
+    },
+    {
+      "id": "decision_to_trust",
+      "source": "D",
+      "source_name": "Decision Support Quality",
+      "target": "L",
+      "target_name": "Legitimacy & Trust",
+      "coefficient": 0.15,
+      "type": "positive",
+      "description": "Decision Support Quality builds Legitimacy & Trust"
+    },
+    {
+      "id": "incidents_erode_trust",
+      "source": "X",
+      "source_name": "Incident Accumulation",
+      "target": "L",
+      "target_name": "Legitimacy & Trust",
+      "coefficient": -0.6,
+      "param_key": "incident_to_trust",
+      "type": "negative",
+      "description": "Incident Accumulation erodes Legitimacy & Trust"
+    },
+    {
+      "id": "capability_to_incidents",
+      "source": "T",
+      "source_name": "Targeting Capability",
+      "target": "X",
+      "target_name": "Incident Accumulation",
+      "coefficient": 0.4,
+      "param_key": "incident_sensitivity",
+      "transform": "(1 - V) * (1 - E)",
+      "type": "positive",
+      "description": "Targeting Capability push causes Incidents when V&V and Ethics are low"
+    },
+    {
+      "id": "vv_prevents_incidents",
+      "source": "V",
+      "source_name": "V&V Maturity",
+      "target": "X",
+      "target_name": "Incident Accumulation",
+      "coefficient": -0.5,
+      "param_key": "vv_protection",
+      "type": "negative",
+      "description": "V&V Maturity reduces Incident Accumulation"
+    },
+    {
+      "id": "incident_decay",
+      "source": null,
+      "source_name": "Time",
+      "target": "X",
+      "target_name": "Incident Accumulation",
+      "coefficient": -0.3,
+      "param_key": "incident_decay",
+      "type": "negative",
+      "description": "Incident Accumulation decays naturally over time"
+    },
+    {
+      "id": "res_to_vv",
+      "source": "R",
+      "source_name": "Resource Capacity",
+      "target": "V",
+      "target_name": "V&V Maturity",
+      "coefficient": 0.3,
+      "param_key": "vv_investment",
+      "type": "positive",
+      "description": "Resource Capacity investment builds V&V Maturity"
+    },
+    {
+      "id": "ethics_to_vv",
+      "source": "E",
+      "source_name": "Ethics Compliance",
+      "target": "V",
+      "target_name": "V&V Maturity",
+      "coefficient": 0.2,
+      "type": "positive",
+      "description": "Ethics Compliance culture supports V&V Maturity"
+    },
+    {
+      "id": "data_to_vv",
+      "source": "Q",
+      "source_name": "Data Quality",
+      "target": "V",
+      "target_name": "V&V Maturity",
+      "coefficient": 0.15,
+      "type": "positive",
+      "description": "Data Quality supports V&V Maturity (test data quality)"
+    },
+    {
+      "id": "res_to_data",
+      "source": "R",
+      "source_name": "Resource Capacity",
+      "target": "Q",
+      "target_name": "Data Quality",
+      "coefficient": 0.25,
+      "type": "positive",
+      "description": "Resource Capacity improves Data Quality"
+    },
+    {
+      "id": "int_to_data",
+      "source": "I",
+      "source_name": "System Integration",
+      "target": "Q",
+      "target_name": "Data Quality",
+      "coefficient": 0.2,
+      "type": "positive",
+      "description": "System Integration improves Data Quality (data pipelines)"
+    },
+    {
+      "id": "ethics_to_data",
+      "source": "E",
+      "source_name": "Ethics Compliance",
+      "target": "Q",
+      "target_name": "Data Quality",
+      "coefficient": 0.15,
+      "type": "positive",
+      "description": "Ethics Compliance improves Data Quality (data governance)"
+    }
+  ],
+
+  "link_parameters": {
+    "surveillance_to_targeting": {"description": "Surveillance → Targeting link strength", "value": 0.6, "min": 0.0, "max": 1.0},
+    "targeting_to_decision": {"description": "Targeting → Decision Support link strength", "value": 0.5, "min": 0.0, "max": 1.0},
+    "ethics_constraint": {"description": "Ethics constraint on Targeting", "value": 0.3, "min": 0.0, "max": 1.0},
+    "data_to_capability": {"description": "Data Quality → Capabilities link strength", "value": 0.4, "min": 0.0, "max": 1.0},
+    "incident_sensitivity": {"description": "Capability push → Incidents sensitivity", "value": 0.4, "min": 0.0, "max": 1.0},
+    "vv_protection": {"description": "V&V → Incident prevention strength", "value": 0.5, "min": 0.0, "max": 1.0},
+    "trust_to_resources": {"description": "Trust → Resources (procurement) link", "value": 0.4, "min": 0.0, "max": 1.0},
+    "incident_to_trust": {"description": "Incidents → Trust erosion strength", "value": 0.6, "min": 0.0, "max": 1.0}
+  }
+}

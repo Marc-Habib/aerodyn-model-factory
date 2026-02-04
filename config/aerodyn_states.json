@@ -1,0 +1,94 @@
+{
+  "_description": "AeroDyn Systems - Stock Variables (State Variables). Each stock represents a normalized [0,1] level.",
+  
+  "T": {
+    "name": "Targeting Capability",
+    "short": "Targeting",
+    "category": "capability",
+    "description": "AI-enabled targeting accuracy and reliability. Higher values indicate more precise, autonomous targeting systems.",
+    "initial": 0.3,
+    "min": 0.0,
+    "max": 1.0
+  },
+  "S": {
+    "name": "Surveillance Coverage",
+    "short": "Surveillance",
+    "category": "capability",
+    "description": "Sensor network effectiveness and ISR (Intelligence, Surveillance, Reconnaissance) coverage. Feeds targeting and decision support.",
+    "initial": 0.4,
+    "min": 0.0,
+    "max": 1.0
+  },
+  "D": {
+    "name": "Decision Support Quality",
+    "short": "Decision Support",
+    "category": "capability",
+    "description": "Human-AI teaming effectiveness. Quality of AI recommendations and operator trust in decision support systems.",
+    "initial": 0.3,
+    "min": 0.0,
+    "max": 1.0
+  },
+  "E": {
+    "name": "Ethics Compliance",
+    "short": "Ethics",
+    "category": "governance",
+    "description": "Adherence to ethical guidelines, IHL (International Humanitarian Law), and political constraints. High E constrains aggressive capabilities.",
+    "initial": 0.5,
+    "min": 0.0,
+    "max": 1.0
+  },
+  "R": {
+    "name": "Resource Capacity",
+    "short": "Resources",
+    "category": "execution",
+    "description": "Budget, personnel, and organizational throughput available for development and deployment.",
+    "initial": 0.6,
+    "min": 0.0,
+    "max": 1.0
+  },
+  "I": {
+    "name": "System Integration",
+    "short": "Integration",
+    "category": "execution",
+    "description": "Interoperability maturity across platforms, data systems, and allied forces. Enables capability synergies.",
+    "initial": 0.3,
+    "min": 0.0,
+    "max": 1.0
+  },
+  "L": {
+    "name": "Legitimacy & Trust",
+    "short": "Trust",
+    "category": "governance",
+    "description": "Ministry and public trust in AeroDyn's systems. Drives procurement decisions and political support. Eroded by incidents.",
+    "initial": 0.6,
+    "min": 0.0,
+    "max": 1.0
+  },
+  "X": {
+    "name": "Incident Accumulation",
+    "short": "Incidents",
+    "category": "risk",
+    "description": "Accumulated adverse events: targeting errors, civilian harm, system failures, data breaches. Decays slowly; spikes damage trust.",
+    "initial": 0.1,
+    "min": 0.0,
+    "max": 1.0
+  },
+  "V": {
+    "name": "V&V Maturity",
+    "short": "Verification",
+    "category": "governance",
+    "description": "Verification & Validation process maturity. Reduces incident probability; provides compliance evidence; costly in resources.",
+    "initial": 0.3,
+    "min": 0.0,
+    "max": 1.0
+  },
+  "Q": {
+    "name": "Data Quality",
+    "short": "Data",
+    "category": "capability",
+    "description": "Training data pipeline quality, labeling accuracy, and data governance. Directly impacts AI model performance.",
+    "initial": 0.4,
+    "min": 0.0,
+    "max": 1.0
+  }
+}

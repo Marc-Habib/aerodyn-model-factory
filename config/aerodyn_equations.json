@@ -1,0 +1,317 @@
+{
+  "_description": "AeroDyn Systems - Stock and Flow Equations. Variables: T, S, D, E, R, I, L, X, V, Q. Parameters via p['param_name'].",
+  
+  "stocks": {
+    "T": {
+      "name": "Targeting Capability",
+      "equation": "p['kT'] * (T_target - T)",
+      "target_equation": "clamp(p['surveillance_to_targeting'] * S + 0.2 * R + 0.15 * I + p['data_to_capability'] * Q + p['ai_boost'] - p['ethics_constraint'] * (1 - E), 0, 1)",
+      "description": "Targeting adjusts toward target based on surveillance, resources, integration, data quality, AI boost, constrained by ethics compliance"
+    },
+    "S": {
+      "name": "Surveillance Coverage", 
+      "equation": "p['kS'] * (S_target - S)",
+      "target_equation": "clamp(0.4 * R + 0.25 * I + 0.15 * T + p['data_to_capability'] * Q, 0, 1)",
+      "description": "Surveillance depends on resources, integration, targeting feedback, and data quality"
+    },
+    "D": {
+      "name": "Decision Support Quality",
+      "equation": "p['kD'] * (D_target - D)",
+      "target_equation": "clamp(p['targeting_to_decision'] * T + 0.25 * S + 0.2 * E + 0.15 * V, 0, 1)",
+      "description": "Decision support depends on targeting, surveillance, ethics, and V&V maturity (trust in recommendations)"
+    },
+    "E": {
+      "name": "Ethics Compliance",
+      "equation": "p['kE'] * (E_target - E)",
+      "target_equation": "clamp(p['political_scrutiny'] + 0.25 * R + 0.3 * V + 0.2 * X - 0.15 * T, 0, 1)",
+      "description": "Ethics driven by scrutiny, resources, V&V maturity; incidents increase pressure; aggressive targeting draws scrutiny"
+    },
+    "R": {
+      "name": "Resource Capacity",
+      "equation": "p['kR'] * (R_target - R)",
+      "target_equation": "clamp(p['resource_efficiency'] + p['trust_to_resources'] * L + 0.15 * I - 0.1 * (1 - E) - p['vv_investment'] * V, 0, 1)",
+      "description": "Resources depend on efficiency, trust (procurement), integration; ethics violations and V&V investment cost resources"
+    },
+    "I": {
+      "name": "System Integration",
+      "equation": "p['kI'] * (I_target - I)",
+      "target_equation": "clamp(p['integration_rate'] + 0.12 * T + 0.12 * S + 0.1 * D + 0.1 * Q - 0.1 * p['export_control_pressure'], 0, 1)",
+      "description": "Integration depends on all capabilities and data quality; export controls slow integration"
+    },
+    "L": {
+      "name": "Legitimacy & Trust",
+      "equation": "p['kL'] * (L_target - L)",
+      "target_equation": "clamp(p['base_trust'] + 0.25 * E + 0.2 * V + 0.15 * D - p['incident_to_trust'] * X, 0, 1)",
+      "description": "Trust built by ethics, V&V, decision support quality; eroded by incidents"
+    },
+    "X": {
+      "name": "Incident Accumulation",
+      "equation": "p['kX'] * (X_target - X)",
+      "target_equation": "clamp(p['incident_shock'] + p['incident_sensitivity'] * T * (1 - V) * (1 - E) - p['incident_decay'] * (1 - X), 0, 1)",
+      "description": "Incidents driven by capability push when V&V and ethics are low; decay naturally over time"
+    },
+    "V": {
+      "name": "V&V Maturity",
+      "equation": "p['kV'] * (V_target - V)",
+      "target_equation": "clamp(p['vv_investment'] * R + 0.2 * E + 0.15 * Q, 0, 1)",
+      "description": "V&V maturity depends on resource investment, ethics culture, and data quality"
+    },
+    "Q": {
+      "name": "Data Quality",
+      "equation": "p['kQ'] * (Q_target - Q)",
+      "target_equation": "clamp(p['data_governance'] + 0.25 * R + 0.2 * I + 0.15 * E, 0, 1)",
+      "description": "Data quality depends on governance baseline, resources, integration, and ethics (data handling standards)"
+    }
+  },
+
+  "flows": {
+    "surv_to_target": {
+      "from": "S",
+      "to": "T",
+      "coefficient": "p['surveillance_to_targeting']",
+      "description": "Surveillance Coverage improves Targeting Capability"
+    },
+    "res_to_target": {
+      "from": "R",
+      "to": "T", 
+      "coefficient": "0.2",
+      "description": "Resource Capacity improves Targeting Capability"
+    },
+    "int_to_target": {
+      "from": "I",
+      "to": "T",
+      "coefficient": "0.15",
+      "description": "System Integration improves Targeting Capability"
+    },
+    "data_to_target": {
+      "from": "Q",
+      "to": "T",
+      "coefficient": "p['data_to_capability']",
+      "description": "Data Quality improves Targeting Capability"
+    },
+    "ethics_constrains_target": {
+      "from": "E",
+      "to": "T",
+      "coefficient": "-p['ethics_constraint']",
+      "transform": "1 - E",
+      "description": "Low Ethics Compliance constrains Targeting Capability"
+    },
+    "res_to_surv": {
+      "from": "R",
+      "to": "S",
+      "coefficient": "0.4",
+      "description": "Resource Capacity improves Surveillance Coverage"
+    },
+    "int_to_surv": {
+      "from": "I",
+      "to": "S",
+      "coefficient": "0.25",
+      "description": "System Integration improves Surveillance Coverage"
+    },
+    "target_to_surv": {
+      "from": "T",
+      "to": "S",
+      "coefficient": "0.15",
+      "description": "Targeting Capability feedback improves Surveillance Coverage"
+    },
+    "data_to_surv": {
+      "from": "Q",
+      "to": "S",
+      "coefficient": "p['data_to_capability']",
+      "description": "Data Quality improves Surveillance Coverage"
+    },
+    "target_to_decision": {
+      "from": "T",
+      "to": "D",
+      "coefficient": "p['targeting_to_decision']",
+      "description": "Targeting Capability improves Decision Support Quality"
+    },
+    "surv_to_decision": {
+      "from": "S",
+      "to": "D",
+      "coefficient": "0.25",
+      "description": "Surveillance Coverage improves Decision Support Quality"
+    },
+    "ethics_to_decision": {
+      "from": "E",
+      "to": "D",
+      "coefficient": "0.2",
+      "description": "Ethics Compliance improves Decision Support Quality (trust)"
+    },
+    "vv_to_decision": {
+      "from": "V",
+      "to": "D",
+      "coefficient": "0.15",
+      "description": "V&V Maturity improves Decision Support Quality (reliability)"
+    },
+    "scrutiny_to_ethics": {
+      "from": null,
+      "to": "E",
+      "coefficient": "p['political_scrutiny']",
+      "description": "Political scrutiny drives Ethics Compliance"
+    },
+    "res_to_ethics": {
+      "from": "R",
+      "to": "E",
+      "coefficient": "0.25",
+      "description": "Resource Capacity enables Ethics Compliance"
+    },
+    "vv_to_ethics": {
+      "from": "V",
+      "to": "E",
+      "coefficient": "0.3",
+      "description": "V&V Maturity supports Ethics Compliance (evidence)"
+    },
+    "incidents_to_ethics": {
+      "from": "X",
+      "to": "E",
+      "coefficient": "0.2",
+      "description": "Incident Accumulation increases pressure for Ethics Compliance"
+    },
+    "target_scrutiny": {
+      "from": "T",
+      "to": "E",
+      "coefficient": "-0.15",
+      "description": "Aggressive Targeting Capability draws scrutiny (negative)"
+    },
+    "trust_to_res": {
+      "from": "L",
+      "to": "R",
+      "coefficient": "p['trust_to_resources']",
+      "description": "Legitimacy & Trust drives procurement (Resource Capacity)"
+    },
+    "int_to_res": {
+      "from": "I",
+      "to": "R",
+      "coefficient": "0.15",
+      "description": "System Integration improves Resource Capacity efficiency"
+    },
+    "ethics_cost": {
+      "from": "E",
+      "to": "R",
+      "coefficient": "-0.1",
+      "transform": "1 - E",
+      "description": "Ethics violations cost Resource Capacity"
+    },
+    "vv_cost": {
+      "from": "V",
+      "to": "R",
+      "coefficient": "-p['vv_investment']",
+      "description": "V&V Maturity investment costs Resource Capacity"
+    },
+    "target_to_int": {
+      "from": "T",
+      "to": "I",
+      "coefficient": "0.12",
+      "description": "Targeting Capability improves System Integration"
+    },
+    "surv_to_int": {
+      "from": "S",
+      "to": "I",
+      "coefficient": "0.12",
+      "description": "Surveillance Coverage improves System Integration"
+    },
+    "decision_to_int": {
+      "from": "D",
+      "to": "I",
+      "coefficient": "0.1",
+      "description": "Decision Support Quality improves System Integration"
+    },
+    "data_to_int": {
+      "from": "Q",
+      "to": "I",
+      "coefficient": "0.1",
+      "description": "Data Quality improves System Integration"
+    },
+    "export_control": {
+      "from": null,
+      "to": "I",
+      "coefficient": "-0.1 * p['export_control_pressure']",
+      "description": "Export control pressure slows System Integration"
+    },
+    "ethics_to_trust": {
+      "from": "E",
+      "to": "L",
+      "coefficient": "0.25",
+      "description": "Ethics Compliance builds Legitimacy & Trust"
+    },
+    "vv_to_trust": {
+      "from": "V",
+      "to": "L",
+      "coefficient": "0.2",
+      "description": "V&V Maturity builds Legitimacy & Trust"
+    },
+    "decision_to_trust": {
+      "from": "D",
+      "to": "L",
+      "coefficient": "0.15",
+      "description": "Decision Support Quality builds Legitimacy & Trust"
+    },
+    "incidents_erode_trust": {
+      "from": "X",
+      "to": "L",
+      "coefficient": "-p['incident_to_trust']",
+      "description": "Incident Accumulation erodes Legitimacy & Trust"
+    },
+    "capability_to_incidents": {
+      "from": "T",
+      "to": "X",
+      "coefficient": "p['incident_sensitivity']",
+      "transform": "(1 - V) * (1 - E)",
+      "description": "Targeting Capability push causes Incidents when V&V and Ethics are low"
+    },
+    "vv_prevents_incidents": {
+      "from": "V",
+      "to": "X",
+      "coefficient": "-p['vv_protection']",
+      "description": "V&V Maturity reduces Incident Accumulation"
+    },
+    "incident_decay_flow": {
+      "from": null,
+      "to": "X",
+      "coefficient": "-p['incident_decay']",
+      "transform": "1 - X",
+      "description": "Incident Accumulation decays naturally over time"
+    },
+    "res_to_vv": {
+      "from": "R",
+      "to": "V",
+      "coefficient": "p['vv_investment']",
+      "description": "Resource Capacity investment builds V&V Maturity"
+    },
+    "ethics_to_vv": {
+      "from": "E",
+      "to": "V",
+      "coefficient": "0.2",
+      "description": "Ethics Compliance culture supports V&V Maturity"
+    },
+    "data_to_vv": {
+      "from": "Q",
+      "to": "V",
+      "coefficient": "0.15",
+      "description": "Data Quality supports V&V Maturity"
+    },
+    "res_to_data": {
+      "from": "R",
+      "to": "Q",
+      "coefficient": "0.25",
+      "description": "Resource Capacity improves Data Quality"
+    },
+    "int_to_data": {
+      "from": "I",
+      "to": "Q",
+      "coefficient": "0.2",
+      "description": "System Integration improves Data Quality (pipelines)"
+    },
+    "ethics_to_data": {
+      "from": "E",
+      "to": "Q",
+      "coefficient": "0.15",
+      "description": "Ethics Compliance improves Data Quality (governance)"
+    }
+  },
+
+  "auxiliary": {
+    "clamp": "lambda x, lo, hi: max(lo, min(hi, x))"
+  }
+}

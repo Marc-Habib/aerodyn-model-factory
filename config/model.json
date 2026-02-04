@@ -1,0 +1,921 @@
+{
+  "meta": {
+    "id": "aerodyn_v1",
+    "name": "AeroDyn Systems - Lethal AI Strategic Model",
+    "description": "System dynamics model exploring long-term business impact of AI-enabled weapons investment",
+    "version": "1.0.0",
+    "author": "Model Factory",
+    "created": "2026-02-02",
+    "time_unit": "months",
+    "company": {
+      "name": "AeroDyn Systems",
+      "type": "European defense manufacturer",
+      "focus": "Designs and integrates AI-enabled targeting, surveillance, and decision support systems for weapons platforms",
+      "context": "Works with defense ministries; operates under political and ethical scrutiny"
+    },
+    "questions": [
+      "What happens to our long-term business if we heavily invest in lethal AI?",
+      "How do public opinion, regulation, and contracts interact over 5-10 years?",
+      "Will AI performance actually be sufficient?",
+      "What is the optimal balance between capability push and compliance investment?"
+    ],
+    "data_sources": [
+      "Industry reports on defense procurement cycles",
+      "Academic literature on system dynamics in defense",
+      "Domain expert interviews (anonymized)",
+      "Public data on regulatory timelines and incident rates"
+    ],
+    "assumptions": [
+      "All stocks normalized [0,1] - relative measures, not absolute",
+      "Linear approximations for most relationships",
+      "Deterministic model - no stochastic events",
+      "Time horizon: 10 years (120 months)",
+      "Closed system - no external market disruptions modeled"
+    ],
+    "limitations": [
+      "Does not model competitor behavior explicitly",
+      "Simplified representation of political processes",
+      "No geographic variation in regulations",
+      "Assumes continuous parameter values (no discrete events)"
+    ]
+  },
+
+  "simulation": {
+    "t_start": 0,
+    "t_end": 120,
+    "steps": 500,
+    "method": "RK45"
+  },
+
+  "categories": {
+    "capability": {
+      "name": "Capability",
+      "description": "AI system performance and technical maturity",
+      "color": "#3b82f6",
+      "icon": "cpu"
+    },
+    "governance": {
+      "name": "Governance",
+      "description": "Ethics, compliance, and verification processes",
+      "color": "#8b5cf6",
+      "icon": "shield"
+    },
+    "execution": {
+      "name": "Execution",
+      "description": "Resources and organizational capacity",
+      "color": "#10b981",
+      "icon": "settings"
+    },
+    "risk": {
+      "name": "Risk",
+      "description": "Incidents and adverse events",
+      "color": "#ef4444",
+      "icon": "alert-triangle"
+    },
+    "market": {
+      "name": "Market",
+      "description": "Trust, contracts, and business outcomes",
+      "color": "#f59e0b",
+      "icon": "trending-up"
+    }
+  },
+
+  "stocks": {
+    "T": {
+      "id": "T",
+      "name": "Targeting Capability",
+      "short": "Targeting",
+      "category": "capability",
+      "description": "AI-enabled targeting accuracy and reliability. Higher values indicate more precise, autonomous targeting systems.",
+      "business_meaning": "How good are our AI targeting systems compared to competitors?",
+      "initial": 0.3,
+      "min": 0.0,
+      "max": 1.0,
+      "unit": "normalized [0-1]",
+      "threshold_warning": 0.7,
+      "threshold_danger": 0.9
+    },
+    "S": {
+      "id": "S",
+      "name": "Surveillance Coverage",
+      "short": "Surveillance",
+      "category": "capability",
+      "description": "Sensor network effectiveness and ISR (Intelligence, Surveillance, Reconnaissance) coverage. Feeds targeting and decision support.",
+      "business_meaning": "How comprehensive is our sensor and intelligence gathering capability?",
+      "initial": 0.4,
+      "min": 0.0,
+      "max": 1.0,
+      "unit": "normalized [0-1]",
+      "threshold_warning": 0.6,
+      "threshold_danger": 0.3
+    },
+    "D": {
+      "id": "D",
+      "name": "Decision Support Quality",
+      "short": "Decision Support",
+      "category": "capability",
+      "description": "Human-AI teaming effectiveness. Quality of AI recommendations and operator trust in decision support systems.",
+      "business_meaning": "How much do operators trust and rely on our AI recommendations?",
+      "initial": 0.3,
+      "min": 0.0,
+      "max": 1.0,
+      "unit": "normalized [0-1]",
+      "threshold_warning": 0.6,
+      "threshold_danger": 0.3
+    },
+    "E": {
+      "id": "E",
+      "name": "Ethics Compliance",
+      "short": "Ethics",
+      "category": "governance",
+      "description": "Adherence to ethical guidelines, IHL (International Humanitarian Law), and political constraints. High E constrains aggressive capabilities.",
+      "business_meaning": "How well do we meet ethical and legal requirements for AI weapons?",
+      "initial": 0.5,
+      "min": 0.0,
+      "max": 1.0,
+      "unit": "normalized [0-1]",
+      "threshold_warning": 0.4,
+      "threshold_danger": 0.3
+    },
+    "R": {
+      "id": "R",
+      "name": "Resource Capacity",
+      "short": "Resources",
+      "category": "execution",
+      "description": "Budget, personnel, and organizational throughput available for development and deployment.",
+      "business_meaning": "How much funding and talent do we have for AI development?",
+      "initial": 0.6,
+      "min": 0.0,
+      "max": 1.0,
+      "unit": "normalized [0-1]",
+      "threshold_warning": 0.4,
+      "threshold_danger": 0.3
+    },
+    "I": {
+      "id": "I",
+      "name": "System Integration",
+      "short": "Integration",
+      "category": "execution",
+      "description": "Interoperability maturity across platforms, data systems, and allied forces. Enables capability synergies.",
+      "business_meaning": "How well do our systems work together and with allies?",
+      "initial": 0.3,
+      "min": 0.0,
+      "max": 1.0,
+      "unit": "normalized [0-1]",
+      "threshold_warning": 0.5,
+      "threshold_danger": 0.3
+    },
+    "L": {
+      "id": "L",
+      "name": "Legitimacy & Trust",
+      "short": "Trust",
+      "category": "market",
+      "description": "Ministry and public trust in AeroDyn's systems. Drives procurement decisions and political support. Eroded by incidents.",
+      "business_meaning": "Do governments and the public trust us to deliver safe AI weapons?",
+      "initial": 0.6,
+      "min": 0.0,
+      "max": 1.0,
+      "unit": "normalized [0-1]",
+      "threshold_warning": 0.5,
+      "threshold_danger": 0.3
+    },
+    "X": {
+      "id": "X",
+      "name": "Incident Accumulation",
+      "short": "Incidents",
+      "category": "risk",
+      "description": "Accumulated adverse events: targeting errors, civilian harm, system failures, data breaches. Decays slowly; spikes damage trust.",
+      "business_meaning": "How many serious failures have we had with our AI systems?",
+      "initial": 0.1,
+      "min": 0.0,
+      "max": 1.0,
+      "unit": "normalized [0-1]",
+      "threshold_warning": 0.4,
+      "threshold_danger": 0.6,
+      "invert": true
+    },
+    "V": {
+      "id": "V",
+      "name": "V&V Maturity",
+      "short": "Verification",
+      "category": "governance",
+      "description": "Verification & Validation process maturity. Reduces incident probability; provides compliance evidence; costly in resources.",
+      "business_meaning": "How rigorous are our testing and validation processes?",
+      "initial": 0.3,
+      "min": 0.0,
+      "max": 1.0,
+      "unit": "normalized [0-1]",
+      "threshold_warning": 0.5,
+      "threshold_danger": 0.3
+    },
+    "Q": {
+      "id": "Q",
+      "name": "Data Quality",
+      "short": "Data",
+      "category": "capability",
+      "description": "Training data pipeline quality, labeling accuracy, and data governance. Directly impacts AI model performance.",
+      "business_meaning": "How good is the data we use to train our AI models?",
+      "initial": 0.4,
+      "min": 0.0,
+      "max": 1.0,
+      "unit": "normalized [0-1]",
+      "threshold_warning": 0.5,
+      "threshold_danger": 0.3
+    }
+  },
+
+  "parameters": {
+    "kT": {
+      "id": "kT",
+      "name": "Targeting Adjustment Speed",
+      "category": "speeds",
+      "description": "How fast targeting capability converges to its target (higher = faster response)",
+      "business_meaning": "How quickly can we improve our targeting systems?",
+      "value": 0.7,
+      "min": 0.0,
+      "max": 2.0,
+      "unit": "1/month",
+      "sensitivity": "medium"
+    },
+    "kS": {
+      "id": "kS",
+      "name": "Surveillance Adjustment Speed",
+      "category": "speeds",
+      "description": "How fast surveillance coverage converges to its target",
+      "business_meaning": "How quickly can we expand our sensor networks?",
+      "value": 0.6,
+      "min": 0.0,
+      "max": 2.0,
+      "unit": "1/month",
+      "sensitivity": "medium"
+    },
+    "kD": {
+      "id": "kD",
+      "name": "Decision Support Adjustment Speed",
+      "category": "speeds",
+      "description": "How fast decision support quality converges to its target",
+      "business_meaning": "How quickly can we improve operator trust in AI?",
+      "value": 0.5,
+      "min": 0.0,
+      "max": 2.0,
+      "unit": "1/month",
+      "sensitivity": "medium"
+    },
+    "kE": {
+      "id": "kE",
+      "name": "Ethics Adjustment Speed",
+      "category": "speeds",
+      "description": "How fast ethics compliance converges to its target",
+      "business_meaning": "How quickly can we respond to ethical requirements?",
+      "value": 0.4,
+      "min": 0.0,
+      "max": 2.0,
+      "unit": "1/month",
+      "sensitivity": "low"
+    },
+    "kR": {
+      "id": "kR",
+      "name": "Resource Adjustment Speed",
+      "category": "speeds",
+      "description": "How fast resource capacity converges to its target",
+      "business_meaning": "How quickly can we scale up or down our budget?",
+      "value": 0.6,
+      "min": 0.0,
+      "max": 2.0,
+      "unit": "1/month",
+      "sensitivity": "medium"
+    },
+    "kI": {
+      "id": "kI",
+      "name": "Integration Adjustment Speed",
+      "category": "speeds",
+      "description": "How fast system integration converges to its target",
+      "business_meaning": "How quickly can we integrate new systems?",
+      "value": 0.5,
+      "min": 0.0,
+      "max": 2.0,
+      "unit": "1/month",
+      "sensitivity": "medium"
+    },
+    "kL": {
+      "id": "kL",
+      "name": "Trust Adjustment Speed",
+      "category": "speeds",
+      "description": "How fast legitimacy & trust converges to its target (slow - trust builds/erodes gradually)",
+      "business_meaning": "How quickly does public trust change?",
+      "value": 0.3,
+      "min": 0.0,
+      "max": 2.0,
+      "unit": "1/month",
+      "sensitivity": "high"
+    },
+    "kX": {
+      "id": "kX",
+      "name": "Incident Adjustment Speed",
+      "category": "speeds",
+      "description": "How fast incident accumulation converges to its target (incidents decay slowly)",
+      "business_meaning": "How quickly are incidents forgotten?",
+      "value": 0.2,
+      "min": 0.0,
+      "max": 2.0,
+      "unit": "1/month",
+      "sensitivity": "high"
+    },
+    "kV": {
+      "id": "kV",
+      "name": "V&V Adjustment Speed",
+      "category": "speeds",
+      "description": "How fast V&V maturity converges to its target (slow - process maturity takes time)",
+      "business_meaning": "How quickly can we improve our testing processes?",
+      "value": 0.3,
+      "min": 0.0,
+      "max": 2.0,
+      "unit": "1/month",
+      "sensitivity": "medium"
+    },
+    "kQ": {
+      "id": "kQ",
+      "name": "Data Quality Adjustment Speed",
+      "category": "speeds",
+      "description": "How fast data quality converges to its target",
+      "business_meaning": "How quickly can we improve our data pipelines?",
+      "value": 0.5,
+      "min": 0.0,
+      "max": 2.0,
+      "unit": "1/month",
+      "sensitivity": "medium"
+    },
+    "ai_boost": {
+      "id": "ai_boost",
+      "name": "AI Capability Boost",
+      "category": "external",
+      "description": "External AI capability boost (tech breakthrough, vendor partnership)",
+      "business_meaning": "Are we getting help from AI breakthroughs or partnerships?",
+      "value": 0.0,
+      "min": -0.5,
+      "max": 0.5,
+      "unit": "normalized",
+      "sensitivity": "high"
+    },
+    "political_scrutiny": {
+      "id": "political_scrutiny",
+      "name": "Political Scrutiny Level",
+      "category": "external",
+      "description": "External political pressure on ethics (media, parliament, NGOs)",
+      "business_meaning": "How much political pressure are we under?",
+      "value": 0.4,
+      "min": 0.0,
+      "max": 1.0,
+      "unit": "normalized",
+      "sensitivity": "high"
+    },
+    "incident_shock": {
+      "id": "incident_shock",
+      "name": "Incident Shock",
+      "category": "external",
+      "description": "External incident trigger (0 = none, 1 = major incident)",
+      "business_meaning": "Has a major incident just occurred?",
+      "value": 0.0,
+      "min": 0.0,
+      "max": 1.0,
+      "unit": "normalized",
+      "sensitivity": "high"
+    },
+    "procurement_pressure": {
+      "id": "procurement_pressure",
+      "name": "Procurement Pressure",
+      "category": "external",
+      "description": "Ministry pressure for rapid deployment",
+      "business_meaning": "How urgently do customers want our products?",
+      "value": 0.3,
+      "min": 0.0,
+      "max": 1.0,
+      "unit": "normalized",
+      "sensitivity": "medium"
+    },
+    "export_control_pressure": {
+      "id": "export_control_pressure",
+      "name": "Export Control Pressure",
+      "category": "external",
+      "description": "Geopolitical export control tightening",
+      "business_meaning": "Are export restrictions limiting our market?",
+      "value": 0.2,
+      "min": 0.0,
+      "max": 1.0,
+      "unit": "normalized",
+      "sensitivity": "medium"
+    },
+    "resource_efficiency": {
+      "id": "resource_efficiency",
+      "name": "Resource Efficiency",
+      "category": "base",
+      "description": "Base resource efficiency (organizational maturity)",
+      "business_meaning": "How efficiently do we use our resources?",
+      "value": 0.7,
+      "min": 0.0,
+      "max": 1.0,
+      "unit": "normalized",
+      "sensitivity": "low"
+    },
+    "integration_rate": {
+      "id": "integration_rate",
+      "name": "Base Integration Rate",
+      "category": "base",
+      "description": "Base integration rate (platform openness)",
+      "business_meaning": "How open are our platforms to integration?",
+      "value": 0.5,
+      "min": 0.0,
+      "max": 1.0,
+      "unit": "normalized",
+      "sensitivity": "low"
+    },
+    "base_trust": {
+      "id": "base_trust",
+      "name": "Baseline Trust",
+      "category": "base",
+      "description": "Baseline legitimacy from track record",
+      "business_meaning": "What is our baseline reputation?",
+      "value": 0.5,
+      "min": 0.0,
+      "max": 1.0,
+      "unit": "normalized",
+      "sensitivity": "low"
+    },
+    "incident_decay": {
+      "id": "incident_decay",
+      "name": "Incident Memory Decay",
+      "category": "base",
+      "description": "Natural incident memory decay rate",
+      "business_meaning": "How quickly are incidents forgotten?",
+      "value": 0.3,
+      "min": 0.0,
+      "max": 1.0,
+      "unit": "normalized",
+      "sensitivity": "medium"
+    },
+    "vv_investment": {
+      "id": "vv_investment",
+      "name": "V&V Investment Priority",
+      "category": "base",
+      "description": "V&V investment priority (share of resources)",
+      "business_meaning": "What % of budget goes to testing and validation?",
+      "value": 0.3,
+      "min": 0.0,
+      "max": 1.0,
+      "unit": "normalized",
+      "sensitivity": "high"
+    },
+    "data_governance": {
+      "id": "data_governance",
+      "name": "Data Governance Baseline",
+      "category": "base",
+      "description": "Data governance baseline (policies, labeling standards)",
+      "business_meaning": "How mature are our data management practices?",
+      "value": 0.4,
+      "min": 0.0,
+      "max": 1.0,
+      "unit": "normalized",
+      "sensitivity": "medium"
+    },
+    "surveillance_to_targeting": {
+      "id": "surveillance_to_targeting",
+      "name": "Surveillance → Targeting Strength",
+      "category": "coupling",
+      "description": "How much surveillance coverage improves targeting capability",
+      "business_meaning": "How much do better sensors improve targeting?",
+      "value": 0.6,
+      "min": 0.0,
+      "max": 1.0,
+      "unit": "normalized",
+      "sensitivity": "high"
+    },
+    "targeting_to_decision": {
+      "id": "targeting_to_decision",
+      "name": "Targeting → Decision Support Strength",
+      "category": "coupling",
+      "description": "How much targeting capability improves decision support",
+      "business_meaning": "How much does targeting improve decision support?",
+      "value": 0.5,
+      "min": 0.0,
+      "max": 1.0,
+      "unit": "normalized",
+      "sensitivity": "medium"
+    },
+    "ethics_constraint": {
+      "id": "ethics_constraint",
+      "name": "Ethics Constraint Strength",
+      "category": "coupling",
+      "description": "How much low ethics compliance limits targeting capability",
+      "business_meaning": "How much do ethical concerns slow capability development?",
+      "value": 0.3,
+      "min": 0.0,
+      "max": 1.0,
+      "unit": "normalized",
+      "sensitivity": "high"
+    },
+    "incident_sensitivity": {
+      "id": "incident_sensitivity",
+      "name": "Incident Sensitivity",
+      "category": "coupling",
+      "description": "How much capability push increases incident risk",
+      "business_meaning": "How risky is pushing capability without safeguards?",
+      "value": 0.4,
+      "min": 0.0,
+      "max": 1.0,
+      "unit": "normalized",
+      "sensitivity": "high"
+    },
+    "vv_protection": {
+      "id": "vv_protection",
+      "name": "V&V Protection Strength",
+      "category": "coupling",
+      "description": "How much V&V maturity reduces incident probability",
+      "business_meaning": "How effective is testing at preventing incidents?",
+      "value": 0.5,
+      "min": 0.0,
+      "max": 1.0,
+      "unit": "normalized",
+      "sensitivity": "high"
+    },
+    "trust_to_resources": {
+      "id": "trust_to_resources",
+      "name": "Trust → Resources Strength",
+      "category": "coupling",
+      "description": "How much trust drives procurement and resources",
+      "business_meaning": "How much does trust translate to contracts?",
+      "value": 0.4,
+      "min": 0.0,
+      "max": 1.0,
+      "unit": "normalized",
+      "sensitivity": "high"
+    },
+    "incident_to_trust": {
+      "id": "incident_to_trust",
+      "name": "Incident → Trust Erosion Strength",
+      "category": "coupling",
+      "description": "How much incidents erode trust",
+      "business_meaning": "How badly do incidents damage our reputation?",
+      "value": 0.6,
+      "min": 0.0,
+      "max": 1.0,
+      "unit": "normalized",
+      "sensitivity": "high"
+    },
+    "data_to_capability": {
+      "id": "data_to_capability",
+      "name": "Data → Capability Strength",
+      "category": "coupling",
+      "description": "How much data quality improves capabilities",
+      "business_meaning": "How much does better data improve AI performance?",
+      "value": 0.4,
+      "min": 0.0,
+      "max": 1.0,
+      "unit": "normalized",
+      "sensitivity": "high"
+    }
+  },
+
+  "equations": {
+    "T": {
+      "target": "clamp(p['surveillance_to_targeting'] * S + 0.2 * R + 0.15 * I + p['data_to_capability'] * Q + p['ai_boost'] - p['ethics_constraint'] * (1 - E), 0, 1)",
+      "derivative": "p['kT'] * (T_target - T)",
+      "explanation": "Targeting improves based on surveillance, resources, integration, and data quality. AI boost accelerates this. Low ethics compliance constrains aggressive capability development."
+    },
+    "S": {
+      "target": "clamp(0.4 * R + 0.25 * I + 0.15 * T + p['data_to_capability'] * Q, 0, 1)",
+      "derivative": "p['kS'] * (S_target - S)",
+      "explanation": "Surveillance depends on resources, integration, targeting feedback, and data quality."
+    },
+    "D": {
+      "target": "clamp(p['targeting_to_decision'] * T + 0.25 * S + 0.2 * E + 0.15 * V, 0, 1)",
+      "derivative": "p['kD'] * (D_target - D)",
+      "explanation": "Decision support depends on targeting, surveillance, ethics (operator trust), and V&V maturity (reliability confidence)."
+    },
+    "E": {
+      "target": "clamp(p['political_scrutiny'] + 0.25 * R + 0.3 * V + 0.2 * X - 0.15 * T, 0, 1)",
+      "derivative": "p['kE'] * (E_target - E)",
+      "explanation": "Ethics driven by political scrutiny, resources (compliance costs money), V&V maturity (evidence of due diligence). Incidents increase pressure. Aggressive targeting draws scrutiny."
+    },
+    "R": {
+      "target": "clamp(p['resource_efficiency'] + p['trust_to_resources'] * L + 0.15 * I - 0.1 * (1 - E) - p['vv_investment'] * V, 0, 1)",
+      "derivative": "p['kR'] * (R_target - R)",
+      "explanation": "Resources depend on efficiency, trust (procurement), and integration. Ethics violations and V&V investment cost resources."
+    },
+    "I": {
+      "target": "clamp(p['integration_rate'] + 0.12 * T + 0.12 * S + 0.1 * D + 0.1 * Q - 0.1 * p['export_control_pressure'], 0, 1)",
+      "derivative": "p['kI'] * (I_target - I)",
+      "explanation": "Integration depends on all capabilities and data quality. Export controls slow integration."
+    },
+    "L": {
+      "target": "clamp(p['base_trust'] + 0.25 * E + 0.2 * V + 0.15 * D - p['incident_to_trust'] * X, 0, 1)",
+      "derivative": "p['kL'] * (L_target - L)",
+      "explanation": "Trust built by ethics, V&V, and decision support quality. Eroded by incidents."
+    },
+    "X": {
+      "target": "clamp(p['incident_shock'] + p['incident_sensitivity'] * T * (1 - V) * (1 - E) - p['incident_decay'] * (1 - X), 0, 1)",
+      "derivative": "p['kX'] * (X_target - X)",
+      "explanation": "Incidents driven by capability push when V&V and ethics are low. Decay naturally over time."
+    },
+    "V": {
+      "target": "clamp(p['vv_investment'] * R + 0.2 * E + 0.15 * Q, 0, 1)",
+      "derivative": "p['kV'] * (V_target - V)",
+      "explanation": "V&V maturity depends on resource investment, ethics culture, and data quality."
+    },
+    "Q": {
+      "target": "clamp(p['data_governance'] + 0.25 * R + 0.2 * I + 0.15 * E, 0, 1)",
+      "derivative": "p['kQ'] * (Q_target - Q)",
+      "explanation": "Data quality depends on governance baseline, resources, integration, and ethics (data handling standards)."
+    }
+  },
+
+  "feedback_loops": [
+    {
+      "id": "R1_capability_growth",
+      "name": "Capability Growth Loop",
+      "type": "reinforcing",
+      "polarity": "+",
+      "stocks": ["T", "S", "D", "L", "R"],
+      "description": "Better capabilities → higher trust → more contracts → more resources → even better capabilities",
+      "business_meaning": "Success breeds success - good products attract funding for better products",
+      "strength": "strong"
+    },
+    {
+      "id": "B1_ethics_constraint",
+      "name": "Ethics Constraint Loop",
+      "type": "balancing",
+      "polarity": "-",
+      "stocks": ["T", "E", "L"],
+      "description": "Aggressive capability push → draws scrutiny → increases ethics pressure → constrains further capability development",
+      "business_meaning": "Push too hard and you trigger political backlash that forces slowdown",
+      "strength": "medium"
+    },
+    {
+      "id": "B2_incident_erosion",
+      "name": "Incident Trust Erosion Loop",
+      "type": "balancing",
+      "polarity": "-",
+      "stocks": ["T", "X", "L", "R"],
+      "description": "Capability push without safeguards → incidents → trust erosion → resource loss → capability decline",
+      "business_meaning": "Cutting corners on safety destroys your business through reputation damage",
+      "strength": "strong"
+    },
+    {
+      "id": "B3_vv_protection",
+      "name": "V&V Protection Loop",
+      "type": "balancing",
+      "polarity": "-",
+      "stocks": ["R", "V", "X"],
+      "description": "Resources invested in V&V → higher V&V maturity → fewer incidents → preserved resources",
+      "business_meaning": "Investing in testing prevents costly failures",
+      "strength": "medium"
+    },
+    {
+      "id": "R2_integration_synergy",
+      "name": "Integration Synergy Loop",
+      "type": "reinforcing",
+      "polarity": "+",
+      "stocks": ["T", "S", "D", "I"],
+      "description": "Better capabilities → better integration → even better capabilities through synergies",
+      "business_meaning": "Systems that work together multiply their effectiveness",
+      "strength": "medium"
+    }
+  ],
+
+  "scenarios": {
+    "baseline": {
+      "name": "Baseline",
+      "description": "Current trajectory - balanced capability development with moderate oversight",
+      "question": "What happens if we continue as-is?",
+      "param_overrides": {},
+      "initial_overrides": {}
+    },
+    "enhanced_AI": {
+      "name": "Enhanced AI",
+      "description": "Boosted AI capabilities with better integration and data quality focus",
+      "question": "What if we get an AI breakthrough or strong partnership?",
+      "param_overrides": {
+        "ai_boost": 0.2,
+        "integration_rate": 0.7,
+        "data_governance": 0.6,
+        "data_to_capability": 0.5
+      },
+      "initial_overrides": {
+        "Q": 0.5
+      }
+    },
+    "high_scrutiny": {
+      "name": "High Scrutiny",
+      "description": "Increased political oversight and ethics constraints after public concern",
+      "question": "What if political pressure intensifies?",
+      "param_overrides": {
+        "political_scrutiny": 0.7,
+        "ethics_constraint": 0.5,
+        "incident_to_trust": 0.8
+      },
+      "initial_overrides": {
+        "E": 0.6,
+        "L": 0.5
+      }
+    },
+    "rapid_capability_race": {
+      "name": "Rapid Capability Race",
+      "description": "Ministry pressure for fast deployment; high AI push, low tolerance for delays, reduced V&V investment",
+      "question": "What if we prioritize speed over safety?",
+      "param_overrides": {
+        "ai_boost": 0.3,
+        "procurement_pressure": 0.8,
+        "vv_investment": 0.15,
+        "incident_sensitivity": 0.6,
+        "political_scrutiny": 0.2
+      },
+      "initial_overrides": {
+        "T": 0.4,
+        "V": 0.2,
+        "R": 0.7
+      }
+    },
+    "post_incident_crisis": {
+      "name": "Post-Incident Crisis",
+      "description": "Major targeting incident occurred; trust collapsed, scrutiny spiked, compliance investment required",
+      "question": "What if we have a major incident?",
+      "param_overrides": {
+        "incident_shock": 0.6,
+        "political_scrutiny": 0.9,
+        "incident_to_trust": 0.8,
+        "vv_investment": 0.5,
+        "ethics_constraint": 0.6
+      },
+      "initial_overrides": {
+        "X": 0.7,
+        "L": 0.3,
+        "E": 0.4,
+        "T": 0.5
+      }
+    },
+    "compliance_first": {
+      "name": "Compliance First",
+      "description": "Proactive V&V and ethics investment before capability push; slower but sustainable growth",
+      "question": "What if we prioritize safety and compliance?",
+      "param_overrides": {
+        "vv_investment": 0.6,
+        "data_governance": 0.7,
+        "political_scrutiny": 0.5,
+        "ai_boost": 0.0,
+        "incident_sensitivity": 0.3,
+        "vv_protection": 0.7
+      },
+      "initial_overrides": {
+        "V": 0.5,
+        "E": 0.6,
+        "Q": 0.5,
+        "T": 0.2
+      }
+    },
+    "export_restricted": {
+      "name": "Export Restricted",
+      "description": "Geopolitical tensions tighten export controls; integration slowed, allied interoperability constrained",
+      "question": "What if export controls tighten?",
+      "param_overrides": {
+        "export_control_pressure": 0.7,
+        "integration_rate": 0.3,
+        "procurement_pressure": 0.2
+      },
+      "initial_overrides": {
+        "I": 0.2
+      }
+    }
+  },
+
+  "kpis": {
+    "capability_index": {
+      "id": "capability_index",
+      "name": "Capability Index",
+      "formula": "(T + S + D) / 3",
+      "description": "Overall AI system capability",
+      "business_meaning": "How competitive are our AI weapons systems?",
+      "good_threshold": 0.6,
+      "warning_threshold": 0.4,
+      "danger_threshold": 0.3,
+      "unit": "normalized [0-1]",
+      "higher_is_better": true
+    },
+    "risk_index": {
+      "id": "risk_index",
+      "name": "Risk Index",
+      "formula": "X",
+      "description": "Incident accumulation level",
+      "business_meaning": "How many serious failures have we had?",
+      "good_threshold": 0.3,
+      "warning_threshold": 0.5,
+      "danger_threshold": 0.6,
+      "unit": "normalized [0-1]",
+      "higher_is_better": false
+    },
+    "compliance_index": {
+      "id": "compliance_index",
+      "name": "Compliance Index",
+      "formula": "(E + V) / 2",
+      "description": "Ethics and V&V maturity",
+      "business_meaning": "How well do we meet safety and ethical standards?",
+      "good_threshold": 0.6,
+      "warning_threshold": 0.4,
+      "danger_threshold": 0.3,
+      "unit": "normalized [0-1]",
+      "higher_is_better": true
+    },
+    "trust_index": {
+      "id": "trust_index",
+      "name": "Trust Index",
+      "formula": "L",
+      "description": "Political and public trust",
+      "business_meaning": "Do governments and the public trust us?",
+      "good_threshold": 0.6,
+      "warning_threshold": 0.4,
+      "danger_threshold": 0.3,
+      "unit": "normalized [0-1]",
+      "higher_is_better": true
+    }
+  },
+
+  "insights_rules": [
+    {
+      "id": "high_risk_warning",
+      "condition": "X > 0.6",
+      "type": "warning",
+      "title": "High Incident Risk",
+      "template": "Incident accumulation at {X_percent}% - this could damage trust and trigger regulatory scrutiny.",
+      "impact": "high",
+      "recommendation": "Increase V&V investment and slow capability push"
+    },
+    {
+      "id": "trust_erosion",
+      "condition": "L < L_initial * 0.7",
+      "type": "warning",
+      "title": "Trust Erosion",
+      "template": "Legitimacy drops by {trust_drop_percent}%, potentially limiting future procurement and political support.",
+      "impact": "high",
+      "recommendation": "Focus on ethics compliance and incident prevention"
+    },
+    {
+      "id": "vv_gap",
+      "condition": "T > 0.6 && V < 0.4",
+      "type": "warning",
+      "title": "V&V Investment Gap",
+      "template": "High targeting capability ({T_percent}%) without adequate V&V maturity ({V_percent}%) increases incident probability.",
+      "impact": "high",
+      "recommendation": "Increase vv_investment parameter to at least 0.5"
+    },
+    {
+      "id": "sustainable_growth",
+      "condition": "capability_index > capability_index_initial * 1.2 && X < 0.4",
+      "type": "success",
+      "title": "Sustainable Growth",
+      "template": "Capability increases by {capability_growth_percent}% while maintaining low incident risk. This is a balanced approach.",
+      "impact": "high",
+      "recommendation": "Continue current strategy"
+    },
+    {
+      "id": "compliance_strength",
+      "condition": "E > 0.7 && L > 0.7",
+      "type": "success",
+      "title": "Strong Compliance Posture",
+      "template": "High ethics compliance ({E_percent}%) builds trust ({L_percent}%), enabling sustained procurement.",
+      "impact": "medium",
+      "recommendation": "Maintain compliance investment"
+    },
+    {
+      "id": "resource_constraint",
+      "condition": "R < 0.4",
+      "type": "warning",
+      "title": "Resource Constraints",
+      "template": "Resource capacity drops to {R_percent}%, limiting ability to invest in capabilities or compliance.",
+      "impact": "medium",
+      "recommendation": "Focus on trust-building to secure more contracts"
+    }
+  ],
+
+  "ui": {
+    "theme": {
+      "primary": "#2563eb",
+      "secondary": "#8b5cf6",
+      "success": "#10b981",
+      "warning": "#f59e0b",
+      "danger": "#ef4444",
+      "background": "#0f172a",
+      "surface": "#1e293b",
+      "border": "#334155",
+      "text": "#f1f5f9",
+      "textMuted": "#94a3b8"
+    },
+    "graph": {
+      "layout": "force-directed",
+      "node_size_by": "connections",
+      "edge_thickness_by": "coefficient",
+      "show_labels": true,
+      "animate_flows": false,
+      "cluster_by_category": true
+    },
+    "executive_kpis": ["capability_index", "risk_index", "compliance_index", "trust_index"],
+    "default_chart_stocks": ["T", "L", "X", "R"]
+  }
+}

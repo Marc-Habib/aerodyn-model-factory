@@ -1,0 +1,97 @@
+{
+  "baseline": {
+    "name": "Baseline",
+    "description": "Default parameters - balanced capability development with moderate oversight",
+    "param_overrides": {},
+    "initial_overrides": {}
+  },
+  "enhanced_AI": {
+    "name": "Enhanced AI",
+    "description": "Boosted AI capabilities with better integration and data quality focus",
+    "param_overrides": {
+      "ai_boost": 0.2,
+      "integration_rate": 0.7,
+      "data_governance": 0.6,
+      "data_to_capability": 0.5
+    },
+    "initial_overrides": {
+      "Q": 0.5
+    }
+  },
+  "high_scrutiny": {
+    "name": "High Scrutiny",
+    "description": "Increased political oversight and ethics constraints after public concern",
+    "param_overrides": {
+      "political_scrutiny": 0.7,
+      "ethics_constraint": 0.5,
+      "incident_to_trust": 0.8
+    },
+    "initial_overrides": {
+      "E": 0.6,
+      "L": 0.5
+    }
+  },
+  "rapid_capability_race": {
+    "name": "Rapid Capability Race",
+    "description": "Ministry pressure for fast deployment; high AI push, low tolerance for delays, reduced V&V investment",
+    "param_overrides": {
+      "ai_boost": 0.3,
+      "procurement_pressure": 0.8,
+      "vv_investment": 0.15,
+      "incident_sensitivity": 0.6,
+      "political_scrutiny": 0.2
+    },
+    "initial_overrides": {
+      "T": 0.4,
+      "V": 0.2,
+      "R": 0.7
+    }
+  },
+  "post_incident_crisis": {
+    "name": "Post-Incident Crisis",
+    "description": "Major targeting incident occurred; trust collapsed, scrutiny spiked, compliance investment required",
+    "param_overrides": {
+      "incident_shock": 0.6,
+      "political_scrutiny": 0.9,
+      "incident_to_trust": 0.8,
+      "vv_investment": 0.5,
+      "ethics_constraint": 0.6
+    },
+    "initial_overrides": {
+      "X": 0.7,
+      "L": 0.3,
+      "E": 0.4,
+      "T": 0.5
+    }
+  },
+  "compliance_first": {
+    "name": "Compliance First (V&V Investment)",
+    "description": "Proactive V&V and ethics investment before capability push; slower but sustainable growth",
+    "param_overrides": {
+      "vv_investment": 0.6,
+      "data_governance": 0.7,
+      "political_scrutiny": 0.5,
+      "ai_boost": 0.0,
+      "incident_sensitivity": 0.3,
+      "vv_protection": 0.7
+    },
+    "initial_overrides": {
+      "V": 0.5,
+      "E": 0.6,
+      "Q": 0.5,
+      "T": 0.2
+    }
+  },
+  "export_restricted": {
+    "name": "Export Control Pressure",
+    "description": "Geopolitical tensions tighten export controls; integration slowed, allied interoperability constrained",
+    "param_overrides": {
+      "export_control_pressure": 0.7,
+      "integration_rate": 0.3,
+      "procurement_pressure": 0.2
+    },
+    "initial_overrides": {
+      "I": 0.2
+    }
+  }
+}
