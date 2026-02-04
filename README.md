@@ -646,25 +646,6 @@ npm run format
 
 ---
 
-## 🤝 Contributing
-
-Contributions are welcome! Please follow these guidelines:
-
-1. **Fork the repository**
-2. **Create a feature branch** (`git checkout -b feature/amazing-feature`)
-3. **Commit your changes** (`git commit -m 'Add amazing feature'`)
-4. **Push to the branch** (`git push origin feature/amazing-feature`)
-5. **Open a Pull Request**
-
-### Development Guidelines
-
-- Follow existing code style
-- Add tests for new features
-- Update documentation
-- Keep commits atomic and well-described
-
----
-
 ## 📄 License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
@@ -680,23 +661,5 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ---
 
-## 📞 Contact
-
-**Marc Habib**
-- GitHub: [@Marc-Habib](https://github.com/Marc-Habib)
-- Repository: [aerodyn-model-factory](https://github.com/Marc-Habib/aerodyn-model-factory)
-
----
-
-## 🚀 What's Next?
-
-- [ ] Multi-model support
-- [ ] Real-time collaboration
-- [ ] Monte Carlo sensitivity analysis
-- [ ] Machine learning integration
-- [ ] Cloud deployment templates
-- [ ] Mobile app
-
----
 
 **Built with ❤️ for strategic decision-makers and systems thinkers**
