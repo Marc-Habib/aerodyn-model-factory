@@ -22,7 +22,6 @@
 - [API Documentation](#api-documentation)
 - [Development](#development)
 - [Use Cases & Applications](#use-cases--applications)
-- [Contributing](#contributing)
 - [License](#license)
 
 ---
