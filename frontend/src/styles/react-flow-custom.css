@@ -1,0 +1,81 @@
+/* Custom React Flow Theming */
+
+/* Controls styling */
+.react-flow__controls {
+  background: #1e293b !important;
+  border: 1px solid #475569 !important;
+  border-radius: 0.5rem !important;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3) !important;
+}
+
+.react-flow__controls-button {
+  background: #334155 !important;
+  border-bottom: 1px solid #475569 !important;
+  color: #cbd5e1 !important;
+  transition: all 0.2s !important;
+}
+
+.react-flow__controls-button:hover {
+  background: #475569 !important;
+  color: #f1f5f9 !important;
+}
+
+.react-flow__controls-button svg {
+  fill: currentColor !important;
+}
+
+/* MiniMap styling */
+.react-flow__minimap {
+  background: #0f172a !important;
+  border: 1px solid #475569 !important;
+  border-radius: 0.5rem !important;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3) !important;
+}
+
+.react-flow__minimap-mask {
+  fill: #1e293b !important;
+  fill-opacity: 0.6 !important;
+}
+
+.react-flow__minimap-node {
+  fill: #64748b !important;
+  stroke: #94a3b8 !important;
+  stroke-width: 1px !important;
+}
+
+/* Background styling */
+.react-flow__background {
+  background-color: #0f172a !important;
+}
+
+/* Edge styling improvements */
+.react-flow__edge-path {
+  stroke-width: 2px !important;
+}
+
+.react-flow__edge.selected .react-flow__edge-path {
+  stroke-width: 3px !important;
+}
+
+/* Node selection styling */
+.react-flow__node.selected {
+  box-shadow: 0 0 0 2px #3b82f6 !important;
+}
+
+/* Pane styling */
+.react-flow__pane {
+  cursor: grab !important;
+}
+
+.react-flow__pane:active {
+  cursor: grabbing !important;
+}
+
+/* Attribution (hide if desired) */
+.react-flow__attribution {
+  background: rgba(15, 23, 42, 0.8) !important;
+  color: #64748b !important;
+  font-size: 10px !important;
+  padding: 2px 6px !important;
+  border-radius: 4px !important;
+}

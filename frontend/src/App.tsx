@@ -428,9 +428,9 @@ function App() {
               )}
             </div>
 
-            <div className={viewMode === 'graph' && useEnhancedGraph && !editorMode ? '' : 'bg-slate-800/50 rounded-xl p-6 border border-slate-700'}>
+            <div className={viewMode === 'graph' && useEnhancedGraph && !editorMode ? '' : editorMode ? '' : 'bg-slate-800/50 rounded-xl p-6 border border-slate-700'}>
               {editorMode ? (
-                <div className="h-[600px]">
+                <div className="h-[calc(100vh-12rem)]">
                   <GraphEditor
                     modelData={config}
                     onModelUpdate={(effectiveModel) => {

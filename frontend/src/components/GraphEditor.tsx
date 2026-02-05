@@ -24,7 +24,8 @@ import {
 } from '@xyflow/react';
 import type { Node, Edge, Connection, NodeChange } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
-import { Plus, Save, Undo, Redo, Eye, EyeOff, Sparkles } from 'lucide-react';
+import '../styles/react-flow-custom.css';
+import { Plus, Save, Undo, Redo, Eye, EyeOff, Sparkles, Maximize2, Minimize2 } from 'lucide-react';
 import { createDraft, addChangeToDraft, validateDraft, applyDraft } from '../api/drafts';
 import type { Draft, PatchChange } from '../api/drafts';
 import { EditableNode } from './EditableNode';
@@ -68,6 +69,7 @@ export function GraphEditor({ modelData, onModelUpdate }: GraphEditorProps) {
   const [aiProposals, setAiProposals] = useState<PatchChange[]>([]);
   const [aiError, setAiError] = useState<string>();
   const [aiAvailable, setAiAvailable] = useState(false);
+  const [isFullscreen, setIsFullscreen] = useState(false);
 
   // Category colors
   const categoryColors: Record<string, string> = {
@@ -456,7 +458,11 @@ export function GraphEditor({ modelData, onModelUpdate }: GraphEditorProps) {
   }, [addChange]);
 
   return (
-    <div className="relative w-full h-full">
+    <div className={`relative w-full transition-all duration-300 ${
+      isFullscreen 
+        ? 'fixed inset-0 z-50 h-screen' 
+        : 'h-full'
+    }`}>
       {/* Toolbar */}
       <div className="absolute top-4 left-4 z-10 flex gap-2">
         <button
@@ -536,6 +542,14 @@ export function GraphEditor({ modelData, onModelUpdate }: GraphEditorProps) {
         >
           {showDraftPanel ? <EyeOff size={16} /> : <Eye size={16} />}
         </button>
+
+        <button
+          onClick={() => setIsFullscreen(!isFullscreen)}
+          className="flex items-center gap-2 px-3 py-2 bg-slate-700 text-white rounded-lg hover:bg-slate-800 transition-colors"
+          title={isFullscreen ? 'Exit Fullscreen' : 'Enter Fullscreen'}
+        >
+          {isFullscreen ? <Minimize2 size={16} /> : <Maximize2 size={16} />}
+        </button>
       </div>
 
       {/* React Flow Canvas */}
@@ -561,7 +575,7 @@ export function GraphEditor({ modelData, onModelUpdate }: GraphEditorProps) {
       </ReactFlow>
 
       {/* Draft Panel */}
-      {showDraftPanel && draftState.active && (
+      {showDraftPanel && draftState.active && !isFullscreen && (
         <DraftPanel
           draft={draftState.draft}
           changes={draftState.changes}
