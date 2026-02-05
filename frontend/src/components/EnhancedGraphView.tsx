@@ -15,7 +15,7 @@ import type { GraphData } from '../api';
 
 interface EnhancedGraphViewProps {
   data: GraphData | null;
-  equations: { stocks?: Record<string, { name: string; equation: string; target_equation: string; description: string }> };
+  equations: { stocks?: Record<string, { name?: string; equation?: string; target_equation?: string; target?: string; derivative?: string; description?: string }> };
   paramOverrides?: Record<string, number>;
   onUpdateEquation?: (stockId: string, field: 'equation' | 'target_equation' | 'description', value: string) => void;
   onToggleStock?: (stockId: string, enabled: boolean) => void;
@@ -248,8 +248,8 @@ export function EnhancedGraphView({ data, equations, onToggleStock }: EnhancedGr
           description: node.description,
           business_meaning: node.business_meaning,
           color: node.color || '#3b82f6',
-          equation: equation?.equation,
-          target_equation: equation?.target_equation,
+          equation: equation?.derivative || equation?.equation,
+          target_equation: equation?.target || equation?.target_equation,
           isExpanded: expandedNodes.has(node.id),
           isEnabled: enabledStocks.has(node.id),
         },

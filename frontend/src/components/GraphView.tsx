@@ -12,10 +12,12 @@ import '@xyflow/react/dist/style.css';
 import { X } from 'lucide-react';
 
 interface StockDef {
-  name: string;
-  equation: string;
-  target_equation: string;
-  description: string;
+  name?: string;
+  target?: string;
+  derivative?: string;
+  equation?: string;
+  target_equation?: string;
+  description?: string;
 }
 
 interface GraphData {
@@ -191,18 +193,22 @@ export function GraphView({ data, equations, paramOverrides, onNodeClick }: Grap
           <div className="p-4 space-y-4 max-h-80 overflow-y-auto">
             {selectedStock && (
               <>
-                <div>
-                  <div className="text-xs text-slate-500 uppercase tracking-wide mb-1">Target Equation</div>
-                  <code className="block text-xs bg-slate-800 p-2 rounded text-cyan-400 font-mono overflow-x-auto">
-                    {selectedStock.target_equation}
-                  </code>
-                </div>
-                <div>
-                  <div className="text-xs text-slate-500 uppercase tracking-wide mb-1">Derivative</div>
-                  <code className="block text-xs bg-slate-800 p-2 rounded text-emerald-400 font-mono">
-                    d{selectedNode}/dt = {selectedStock.equation}
-                  </code>
-                </div>
+                {(selectedStock.target || selectedStock.target_equation) && (
+                  <div>
+                    <div className="text-xs text-slate-500 uppercase tracking-wide mb-1">Target Equation</div>
+                    <code className="block text-xs bg-slate-800 p-2 rounded text-cyan-400 font-mono overflow-x-auto">
+                      {selectedStock.target || selectedStock.target_equation}
+                    </code>
+                  </div>
+                )}
+                {(selectedStock.derivative || selectedStock.equation) && (
+                  <div>
+                    <div className="text-xs text-slate-500 uppercase tracking-wide mb-1">Derivative</div>
+                    <code className="block text-xs bg-slate-800 p-2 rounded text-emerald-400 font-mono overflow-x-auto">
+                      d{selectedNode}/dt = {selectedStock.derivative || selectedStock.equation}
+                    </code>
+                  </div>
+                )}
               </>
             )}
             
