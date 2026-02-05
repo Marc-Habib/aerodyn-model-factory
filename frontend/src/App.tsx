@@ -5,6 +5,7 @@ import { ParameterPanel } from './components/ParameterPanel';
 import { SimulationChart, CompareChart } from './components/Chart';
 import { GraphView } from './components/GraphView';
 import { EnhancedGraphView } from './components/EnhancedGraphView';
+import { GraphEditor } from './components/GraphEditor';
 import { ScenarioModal } from './components/ScenarioModal';
 import { ExecutiveDashboard } from './components/ExecutiveDashboard';
 import { ScenarioComparison } from './components/ScenarioComparison';
@@ -31,6 +32,7 @@ function App() {
   const [equations, setEquations] = useState<Record<string, unknown> | null>(null);
   const [viewMode, setViewMode] = useState<'chart' | 'graph'>('chart');
   const [useEnhancedGraph, setUseEnhancedGraph] = useState(true);
+  const [editorMode, setEditorMode] = useState(false);
   const [userMode, setUserMode] = useState<'executive' | 'expert'>('executive');
   const [modelMeta, setModelMeta] = useState<ModelMeta | null>(null);
   const [feedbackLoops, setFeedbackLoops] = useState<FeedbackLoop[]>([]);
@@ -380,9 +382,9 @@ function App() {
             <div className="flex gap-2 mb-4 items-center justify-between">
               <div className="flex gap-2">
                 <button
-                  onClick={() => setViewMode('chart')}
+                  onClick={() => { setViewMode('chart'); setEditorMode(false); }}
                   className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all ${
-                    viewMode === 'chart' 
+                    viewMode === 'chart' && !editorMode
                       ? 'bg-blue-600 text-white' 
                       : 'bg-slate-700 text-slate-300 hover:bg-slate-600'
                   }`}
@@ -391,9 +393,9 @@ function App() {
                   Simulation
                 </button>
                 <button
-                  onClick={() => setViewMode('graph')}
+                  onClick={() => { setViewMode('graph'); setEditorMode(false); }}
                   className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all ${
-                    viewMode === 'graph' 
+                    viewMode === 'graph' && !editorMode
                       ? 'bg-blue-600 text-white' 
                       : 'bg-slate-700 text-slate-300 hover:bg-slate-600'
                   }`}
@@ -401,8 +403,19 @@ function App() {
                   <Network size={16} />
                   Graph View
                 </button>
+                <button
+                  onClick={() => { setEditorMode(true); setViewMode('graph'); }}
+                  className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+                    editorMode
+                      ? 'bg-green-600 text-white' 
+                      : 'bg-slate-700 text-slate-300 hover:bg-slate-600'
+                  }`}
+                >
+                  <Code size={16} />
+                  Model Editor
+                </button>
               </div>
-              {viewMode === 'graph' && (
+              {viewMode === 'graph' && !editorMode && (
                 <label className="flex items-center gap-2 text-sm text-slate-400">
                   <input
                     type="checkbox"
@@ -415,8 +428,18 @@ function App() {
               )}
             </div>
 
-            <div className={viewMode === 'graph' && useEnhancedGraph ? '' : 'bg-slate-800/50 rounded-xl p-6 border border-slate-700'}>
-              {viewMode === 'graph' ? (
+            <div className={viewMode === 'graph' && useEnhancedGraph && !editorMode ? '' : 'bg-slate-800/50 rounded-xl p-6 border border-slate-700'}>
+              {editorMode ? (
+                <div className="h-[600px]">
+                  <GraphEditor
+                    modelData={config}
+                    onModelUpdate={(effectiveModel) => {
+                      console.log('Model updated:', effectiveModel);
+                      // Could update config here for simulation
+                    }}
+                  />
+                </div>
+              ) : viewMode === 'graph' ? (
                 useEnhancedGraph ? (
                   <EnhancedGraphView
                     data={graphData}

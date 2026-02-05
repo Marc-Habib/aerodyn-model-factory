@@ -11,7 +11,7 @@
  * - Visual diff (green/yellow/red)
  */
 
-import { useCallback, useEffect, useState, useMemo } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import {
   ReactFlow,
   Background,
@@ -20,17 +20,13 @@ import {
   useNodesState,
   useEdgesState,
   addEdge,
-  Node,
-  Edge,
-  Connection,
-  NodeChange,
-  EdgeChange,
   MarkerType,
-  Position,
 } from '@xyflow/react';
+import type { Node, Edge, Connection, NodeChange } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
 import { Plus, Save, Undo, Redo, Eye, EyeOff } from 'lucide-react';
-import { createDraft, addChangeToDraft, validateDraft, applyDraft, Draft, PatchChange } from '../api/drafts';
+import { createDraft, addChangeToDraft, validateDraft, applyDraft } from '../api/drafts';
+import type { Draft, PatchChange } from '../api/drafts';
 import { EditableNode } from './EditableNode';
 import { DraftPanel } from './DraftPanel';
 
