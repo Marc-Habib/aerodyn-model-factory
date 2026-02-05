@@ -30,7 +30,7 @@ from models.patch_system import (
 )
 from models.equation_dsl import EquationDSL, create_validator_from_config
 
-router = APIRouter(prefix="/drafts", tags=["drafts"])
+router = APIRouter(tags=["drafts"])
 
 # Configuration
 DRAFTS_DIR = Path(__file__).parent.parent / "config" / "drafts"

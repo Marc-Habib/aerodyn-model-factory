@@ -35,7 +35,7 @@ app.add_middleware(
 engine = ModelEngine()
 
 # Include draft/patch system router
-app.include_router(draft_router)
+app.include_router(draft_router, prefix="/drafts")
 
 
 class SimulationRequest(BaseModel):
