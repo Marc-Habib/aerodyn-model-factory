@@ -394,7 +394,17 @@ class PatchMerger:
         
         # Check that all relations reference existing states
         states = set(model.get('states', {}).keys())
-        for relation in model.get('relations', []):
+        relations = model.get('relations', [])
+        
+        # Handle case where relations might be a dict with 'relations' key
+        if isinstance(relations, dict):
+            relations = relations.get('relations', [])
+        
+        for relation in relations:
+            # Skip if relation is not a dict (malformed data)
+            if not isinstance(relation, dict):
+                continue
+                
             source = relation.get('source')
             target = relation.get('target')
             

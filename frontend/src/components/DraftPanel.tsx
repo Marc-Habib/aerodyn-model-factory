@@ -11,9 +11,11 @@ interface DraftPanelProps {
   draft: Draft | null;
   changes: PatchChange[];
   onClose: () => void;
+  onAccept?: (changeIndex: number) => void;
+  onReject?: (changeIndex: number) => void;
 }
 
-export function DraftPanel({ draft, changes, onClose }: DraftPanelProps) {
+export function DraftPanel({ draft, changes, onClose, onAccept, onReject }: DraftPanelProps) {
   if (!draft) return null;
 
   const getOperationLabel = (op: string): string => {
@@ -106,14 +108,14 @@ export function DraftPanel({ draft, changes, onClose }: DraftPanelProps) {
               <div className="flex gap-2 mt-3">
                 <button
                   className="flex-1 flex items-center justify-center gap-1 px-2 py-1 bg-green-600/20 text-green-400 rounded hover:bg-green-600/30 transition-colors text-xs"
-                  onClick={() => console.log('Accept change', index)}
+                  onClick={() => onAccept?.(index)}
                 >
                   <Check size={12} />
                   Accept
                 </button>
                 <button
                   className="flex-1 flex items-center justify-center gap-1 px-2 py-1 bg-red-600/20 text-red-400 rounded hover:bg-red-600/30 transition-colors text-xs"
-                  onClick={() => console.log('Reject change', index)}
+                  onClick={() => onReject?.(index)}
                 >
                   <Trash2 size={12} />
                   Reject

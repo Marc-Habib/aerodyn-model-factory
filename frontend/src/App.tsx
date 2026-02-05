@@ -383,80 +383,41 @@ function App() {
             <div className="flex-1 flex flex-col overflow-hidden max-w-full">
               {/* View mode toggle */}
               <div className="flex gap-2 px-3 py-2 items-center justify-between border-b border-slate-700 bg-slate-800/20">
-              <div className="flex gap-2">
-                <button
-                  onClick={() => { setViewMode('chart'); setEditorMode(false); }}
-                  className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all ${
-                    viewMode === 'chart' && !editorMode
-                      ? 'bg-blue-600 text-white' 
-                      : 'bg-slate-700 text-slate-300 hover:bg-slate-600'
-                  }`}
-                >
-                  <BarChart3 size={16} />
-                  Simulation
-                </button>
-                <button
-                  onClick={() => { setViewMode('graph'); setEditorMode(false); }}
-                  className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all ${
-                    viewMode === 'graph' && !editorMode
-                      ? 'bg-blue-600 text-white' 
-                      : 'bg-slate-700 text-slate-300 hover:bg-slate-600'
-                  }`}
-                >
-                  <Network size={16} />
-                  Graph View
-                </button>
-                <button
-                  onClick={() => { setEditorMode(true); setViewMode('graph'); }}
-                  className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all ${
-                    editorMode
-                      ? 'bg-green-600 text-white' 
-                      : 'bg-slate-700 text-slate-300 hover:bg-slate-600'
-                  }`}
-                >
-                  <Code size={16} />
-                  Model Editor
-                </button>
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => setViewMode('chart')}
+                    className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+                      viewMode === 'chart'
+                        ? 'bg-blue-600 text-white' 
+                        : 'bg-slate-700 text-slate-300 hover:bg-slate-600'
+                    }`}
+                  >
+                    <BarChart3 size={16} />
+                    Simulation
+                  </button>
+                  <button
+                    onClick={() => setViewMode('graph')}
+                    className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+                      viewMode === 'graph'
+                        ? 'bg-blue-600 text-white' 
+                        : 'bg-slate-700 text-slate-300 hover:bg-slate-600'
+                    }`}
+                  >
+                    <Network size={16} />
+                    Interactive Graph
+                  </button>
                 </div>
-                {viewMode === 'graph' && !editorMode && (
-                  <label className="flex items-center gap-2 text-sm text-slate-400">
-                    <input
-                      type="checkbox"
-                      checked={useEnhancedGraph}
-                      onChange={(e) => setUseEnhancedGraph(e.target.checked)}
-                      className="rounded border-slate-600 text-blue-600 focus:ring-blue-500"
-                    />
-                    Enhanced Graph
-                  </label>
-                )}
               </div>
 
               {/* Content Area - Full Width to Edge */}
-              <div className={`flex-1 overflow-auto max-h-full ${viewMode === 'graph' && useEnhancedGraph && !editorMode ? '' : editorMode ? '' : 'p-6 bg-slate-800/50'}`}>
-                {editorMode ? (
-                  <div className="h-full w-full">
-                  <GraphEditor
-                    modelData={config}
-                    onModelUpdate={(effectiveModel) => {
-                      console.log('Model updated:', effectiveModel);
-                      // Could update config here for simulation
-                    }}
-                  />
-                </div>
-              ) : viewMode === 'graph' ? (
-                useEnhancedGraph ? (
+              <div className={`flex-1 overflow-auto max-h-full ${viewMode === 'graph' ? '' : 'p-6 bg-slate-800/50'}`}>
+                {viewMode === 'graph' ? (
                   <EnhancedGraphView
                     data={graphData}
-                    equations={equations as { stocks?: Record<string, { name: string; equation: string; target_equation: string; description: string }> }}
+                    equations={equations as { stocks?: Record<string, { name?: string; equation?: string; target_equation?: string; target?: string; derivative?: string; description?: string }> }}
                     paramOverrides={selectedScenario && config ? config.scenarios[selectedScenario]?.param_overrides : undefined}
+                    modelData={config}
                   />
-                ) : (
-                  <GraphView 
-                    data={graphData} 
-                    equations={equations as { stocks?: Record<string, { name: string; equation: string; target_equation: string; description: string }> }}
-                    paramOverrides={selectedScenario && config ? config.scenarios[selectedScenario]?.param_overrides : undefined}
-                  />
-                )
               ) : compareMode && allResults ? (
                 <div>
                   <div className="flex items-center gap-4 mb-4">

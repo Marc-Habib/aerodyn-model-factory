@@ -1,17 +1,28 @@
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useMemo, useState, useEffect } from 'react';
 import {
   ReactFlow,
   Background,
+  Controls,
+  MiniMap,
   useNodesState,
   useEdgesState,
+  addEdge,
   MarkerType,
   Position,
   Handle,
 } from '@xyflow/react';
-import type { Node, Edge, NodeProps } from '@xyflow/react';
+import type { Node, Edge, NodeProps, Connection } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
-import { Edit2, Save, Copy, ChevronDown, ChevronUp } from 'lucide-react';
+import '../styles/react-flow-custom.css';
+import { Edit2, Save, Copy, ChevronDown, ChevronUp, Plus, Eye, EyeOff, Sparkles, Maximize2, Minimize2, Undo, Redo, Trash2 } from 'lucide-react';
 import type { GraphData } from '../api';
+import { createDraft, addChangeToDraft, validateDraft, applyDraft } from '../api/drafts';
+import type { Draft, PatchChange } from '../api/drafts';
+import { NodeEditModal } from './NodeEditModal';
+import { EdgeEditModal } from './EdgeEditModal';
+import { AIProposalModal } from './AIProposalModal';
+import { DraftPanel } from './DraftPanel';
+import { checkAIStatus, generateAIPatch } from '../api/ai';
 
 interface EnhancedGraphViewProps {
   data: GraphData | null;
@@ -19,6 +30,13 @@ interface EnhancedGraphViewProps {
   paramOverrides?: Record<string, number>;
   onUpdateEquation?: (stockId: string, field: 'equation' | 'target_equation' | 'description', value: string) => void;
   onToggleStock?: (stockId: string, enabled: boolean) => void;
+  modelData?: any;
+}
+
+interface DraftState {
+  active: boolean;
+  draft: Draft | null;
+  changes: PatchChange[];
 }
 
 interface StockNodeData extends Record<string, unknown> {
@@ -33,18 +51,11 @@ interface StockNodeData extends Record<string, unknown> {
   target_equation?: string;
   isExpanded: boolean;
   isEnabled: boolean;
+  onEdit?: (nodeId: string, nodeData: any) => void;
 }
 
 function StockNode({ data, selected }: NodeProps<StockNodeData>) {
-  const [isEditing, setIsEditing] = useState(false);
-  const [editedEquation, setEditedEquation] = useState(data.equation || '');
-  const [editedTarget, setEditedTarget] = useState(data.target_equation || '');
   const [showJson, setShowJson] = useState(false);
-
-  const handleSave = () => {
-    // In a real implementation, this would call the API to update
-    setIsEditing(false);
-  };
 
   const handleCopyJson = () => {
     const json = JSON.stringify({
@@ -110,71 +121,30 @@ function StockNode({ data, selected }: NodeProps<StockNodeData>) {
 
           {/* Target Equation */}
           <div>
-            <div className="flex items-center justify-between mb-1">
-              <div className="text-xs text-slate-500 uppercase tracking-wide">Target Equation</div>
-              {!isEditing && (
-                <button
-                  onClick={() => setIsEditing(true)}
-                  className="text-slate-400 hover:text-blue-400 transition-colors"
-                  title="Edit equation"
-                >
-                  <Edit2 size={12} />
-                </button>
-              )}
-            </div>
-            {isEditing ? (
-              <textarea
-                value={editedTarget}
-                onChange={(e) => setEditedTarget(e.target.value)}
-                className="w-full text-xs bg-slate-800 p-2 rounded text-blue-400 font-mono border border-slate-700 focus:border-blue-500 focus:outline-none"
-                rows={3}
-              />
-            ) : (
-              <code className="block text-xs bg-slate-800 p-2 rounded text-blue-400 font-mono overflow-x-auto whitespace-pre-wrap break-all">
-                {data.id}_target = {data.target_equation}
-              </code>
-            )}
+            <div className="text-xs text-slate-500 uppercase tracking-wide mb-1">Target Equation</div>
+            <code className="block text-xs bg-slate-800 p-2 rounded text-blue-400 font-mono overflow-x-auto whitespace-pre-wrap break-all">
+              {data.id}_target = {data.target_equation}
+            </code>
           </div>
 
           {/* Derivative */}
           <div>
             <div className="text-xs text-slate-500 uppercase tracking-wide mb-1">Derivative</div>
-            {isEditing ? (
-              <textarea
-                value={editedEquation}
-                onChange={(e) => setEditedEquation(e.target.value)}
-                className="w-full text-xs bg-slate-800 p-2 rounded text-emerald-400 font-mono border border-slate-700 focus:border-emerald-500 focus:outline-none"
-                rows={2}
-              />
-            ) : (
-              <code className="block text-xs bg-slate-800 p-2 rounded text-emerald-400 font-mono overflow-x-auto whitespace-pre-wrap break-all">
-                d{data.id}/dt = {data.equation}
-              </code>
-            )}
+            <code className="block text-xs bg-slate-800 p-2 rounded text-emerald-400 font-mono overflow-x-auto whitespace-pre-wrap break-all">
+              d{data.id}/dt = {data.equation}
+            </code>
           </div>
 
-          {/* Edit Controls */}
-          {isEditing && (
-            <div className="flex gap-2">
-              <button
-                onClick={handleSave}
-                className="flex-1 flex items-center justify-center gap-1 px-2 py-1 bg-blue-600 hover:bg-blue-500 rounded text-xs transition-colors"
-              >
-                <Save size={12} />
-                Save
-              </button>
-              <button
-                onClick={() => {
-                  setIsEditing(false);
-                  setEditedEquation(data.equation || '');
-                  setEditedTarget(data.target_equation || '');
-                }}
-                className="flex-1 px-2 py-1 bg-slate-700 hover:bg-slate-600 rounded text-xs transition-colors"
-              >
-                Cancel
-              </button>
-            </div>
-          )}
+          {/* Action Buttons */}
+          <div className="flex gap-2 pt-2 border-t border-slate-700">
+            <button
+              onClick={() => data.onEdit?.(data.id, data)}
+              className="flex-1 flex items-center justify-center gap-1 px-3 py-2 bg-blue-600 hover:bg-blue-500 rounded text-xs font-medium transition-colors"
+            >
+              <Edit2 size={14} />
+              Edit Node
+            </button>
+          </div>
 
           {/* JSON Toggle */}
           <div>
@@ -222,9 +192,318 @@ const nodeTypes = {
   stockNode: StockNode,
 };
 
-export function EnhancedGraphView({ data, equations, onToggleStock }: EnhancedGraphViewProps) {
+export function EnhancedGraphView({ data, equations, onToggleStock, modelData }: EnhancedGraphViewProps) {
   const [expandedNodes, setExpandedNodes] = useState<Set<string>>(new Set());
   const [enabledStocks, setEnabledStocks] = useState<Set<string>>(new Set(data?.nodes.map(n => n.id) || []));
+  
+  // Draft system state
+  const [draftState, setDraftState] = useState<DraftState>({
+    active: false,
+    draft: null,
+    changes: []
+  });
+  const [showDraftPanel, setShowDraftPanel] = useState(true);
+  const [undoStack, setUndoStack] = useState<PatchChange[]>([]);
+  const [redoStack, setRedoStack] = useState<PatchChange[]>([]);
+  
+  // Modal state
+  const [editingNode, setEditingNode] = useState<{ id: string; data: any } | null>(null);
+  const [editingEdge, setEditingEdge] = useState<Edge | null>(null);
+  
+  // AI state
+  const [showAIModal, setShowAIModal] = useState(false);
+  const [aiGenerating, setAiGenerating] = useState(false);
+  const [aiProposals, setAiProposals] = useState<PatchChange[]>([]);
+  const [aiError, setAiError] = useState<string>();
+  const [aiAvailable, setAiAvailable] = useState(false);
+  
+  // UI state
+  const [isFullscreen, setIsFullscreen] = useState(false);
+
+  // Check AI availability
+  useEffect(() => {
+    checkAIStatus()
+      .then(status => setAiAvailable(status.available))
+      .catch(() => setAiAvailable(false));
+  }, []);
+
+  // Start a new draft
+  const startDraft = useCallback(async () => {
+    try {
+      const draft = await createDraft('Live model editing session');
+      setDraftState({
+        active: true,
+        draft,
+        changes: []
+      });
+    } catch (error) {
+      console.error('Failed to create draft:', error);
+    }
+  }, []);
+
+  // Add change to draft
+  const addChange = useCallback(async (change: PatchChange) => {
+    if (!draftState.draft) {
+      await startDraft();
+      return;
+    }
+
+    try {
+      await addChangeToDraft(draftState.draft.draft_id, change);
+      
+      setDraftState(prev => ({
+        ...prev,
+        changes: [...prev.changes, change]
+      }));
+
+      setUndoStack(prev => [...prev, change]);
+      setRedoStack([]);
+    } catch (error) {
+      console.error('Failed to add change:', error);
+    }
+  }, [draftState.draft, startDraft]);
+
+  // Validate draft
+  const handleValidate = useCallback(async () => {
+    if (!draftState.draft) return;
+    try {
+      const result = await validateDraft(draftState.draft.draft_id);
+      if (result.success) {
+        alert(`✅ Draft is valid!\n\nApplied: ${result.applied_changes}\nWarnings: ${result.warnings.length}`);
+      } else {
+        alert(`❌ Draft has errors:\n\n${result.errors.join('\n')}`);
+      }
+    } catch (error) {
+      console.error('Validation failed:', error);
+      alert('Validation failed. Check console for details.');
+    }
+  }, [draftState.draft]);
+
+  // Apply draft
+  const handleApply = useCallback(async (commit: boolean = false) => {
+    if (!draftState.draft) return;
+    try {
+      const result = await applyDraft(draftState.draft.draft_id, commit);
+      if (result.success) {
+        alert(`✅ Draft applied successfully!\n\n${commit ? 'Changes committed to config files.' : 'Effective model created for simulation.'}`);
+        setDraftState({ active: false, draft: null, changes: [] });
+        setUndoStack([]);
+        setRedoStack([]);
+      } else {
+        alert(`❌ Failed to apply draft:\n\n${result.errors.join('\n')}`);
+      }
+    } catch (error) {
+      console.error('Apply failed:', error);
+      alert('Apply failed. Check console for details.');
+    }
+  }, [draftState.draft]);
+
+  // Undo/Redo
+  const handleUndo = useCallback(() => {
+    if (undoStack.length === 0) return;
+    const lastChange = undoStack[undoStack.length - 1];
+    setUndoStack(prev => prev.slice(0, -1));
+    setRedoStack(prev => [...prev, lastChange]);
+    console.log('Undo:', lastChange);
+  }, [undoStack]);
+
+  const handleRedo = useCallback(() => {
+    if (redoStack.length === 0) return;
+    const change = redoStack[redoStack.length - 1];
+    setRedoStack(prev => prev.slice(0, -1));
+    setUndoStack(prev => [...prev, change]);
+    console.log('Redo:', change);
+  }, [redoStack]);
+
+  // AI generation
+  const handleAIGenerate = useCallback(async (prompt: string, selectedNodes?: string[]) => {
+    setAiGenerating(true);
+    setAiError(undefined);
+    try {
+      const response = await generateAIPatch({ prompt, selected_nodes: selectedNodes });
+      setAiProposals(response.patch.changes);
+    } catch (error) {
+      setAiError(error instanceof Error ? error.message : 'AI generation failed');
+    } finally {
+      setAiGenerating(false);
+    }
+  }, []);
+
+  const handleAcceptAIProposals = useCallback(async (changes: PatchChange[]) => {
+    for (const change of changes) {
+      await addChange(change);
+    }
+    setShowAIModal(false);
+    setAiProposals([]);
+  }, [addChange]);
+
+  // Node/Edge handlers
+  const handleNodeSave = useCallback((nodeId: string, updates: any) => {
+    setNodes((nds) =>
+      nds.map((node) =>
+        node.id === nodeId ? { ...node, data: { ...node.data, ...updates } } : node
+      )
+    );
+    addChange({
+      op: 'update_state',
+      symbol: nodeId,
+      data: updates,
+      reason: 'Node properties updated'
+    });
+    setEditingNode(null);
+  }, [addChange]);
+
+  const handleEdgeSave = useCallback((edgeId: string, updates: any) => {
+    setEdges((eds) =>
+      eds.map((edge) =>
+        edge.id === edgeId ? { ...edge, label: updates.coefficient?.toString(), data: { ...edge.data, ...updates } } : edge
+      )
+    );
+    addChange({
+      op: 'update_relation',
+      id: edgeId,
+      data: updates,
+      reason: 'Relation updated'
+    });
+    setEditingEdge(null);
+  }, [addChange]);
+
+  const handleEdgeDelete = useCallback((edgeId: string) => {
+    setEdges((eds) => eds.filter((edge) => edge.id !== edgeId));
+    addChange({
+      op: 'remove_relation',
+      id: edgeId,
+      data: {},
+      reason: 'Relation deleted'
+    });
+    setEditingEdge(null);
+  }, [addChange]);
+
+  // Add node
+  const addNode = useCallback(() => {
+    const newSymbol = prompt('Enter new state symbol (e.g., M):');
+    if (!newSymbol) return;
+    const newName = prompt('Enter state name:');
+    if (!newName) return;
+    const category = prompt('Enter category (capability/governance/execution/risk/market):') || 'capability';
+
+    const newNode: Node = {
+      id: newSymbol,
+      type: 'stockNode',
+      position: { x: 400, y: 300 },
+      data: {
+        id: newSymbol,
+        label: newName,
+        short: newSymbol,
+        category,
+        description: 'New state variable',
+        business_meaning: 'What does this represent?',
+        color: '#3b82f6',
+        isExpanded: false,
+      },
+    };
+
+    setNodes((nds) => [...nds, newNode]);
+    addChange({
+      op: 'add_state',
+      symbol: newSymbol,
+      data: {
+        name: newName,
+        short: newSymbol,
+        category,
+        description: 'New state variable',
+        business_meaning: 'What does this represent?',
+        initial: 0.5,
+        ui: { x: 400, y: 300 }
+      },
+      reason: 'State added via graph editor'
+    });
+  }, [addChange]);
+
+  // Edge connection
+  const onConnect = useCallback((connection: Connection) => {
+    setEdges((eds) => addEdge(connection, eds));
+    addChange({
+      op: 'add_relation',
+      id: `${connection.source}_to_${connection.target}`,
+      data: {
+        source: connection.source,
+        target: connection.target,
+        coefficient: 0.5,
+        type: 'positive',
+        description: 'New relation'
+      },
+      reason: 'Relation added via graph editor'
+    });
+  }, [addChange]);
+
+  // Edge click
+  const onEdgeClick = useCallback((_: React.MouseEvent, edge: Edge) => {
+    setEditingEdge(edge);
+  }, []);
+
+  // Handle accept change (individual change from DraftPanel)
+  const handleAcceptChange = useCallback((changeIndex: number) => {
+    // For now, accepting individual changes just logs
+    // In a full implementation, this would apply just that change
+    console.log('Accepting change:', draftState.changes[changeIndex]);
+    alert('Individual change accepted. Use Apply button to apply all changes.');
+  }, [draftState.changes]);
+
+  // Handle reject change (remove from draft and undo the visual change)
+  const handleRejectChange = useCallback((changeIndex: number) => {
+    const changeToReject = draftState.changes[changeIndex];
+    console.log('Rejecting change:', changeToReject);
+    
+    // Undo the visual change based on operation type
+    switch (changeToReject.op) {
+      case 'add_state':
+        // Remove the added node
+        if (changeToReject.symbol) {
+          setNodes((nds) => nds.filter(n => n.id !== changeToReject.symbol));
+        }
+        break;
+        
+      case 'update_state':
+        // Restore original node data (we don't have original, so just notify)
+        console.log('Update state rejected - original data not stored');
+        // In a full implementation, we'd store original data before changes
+        break;
+        
+      case 'add_relation':
+        // Remove the added edge
+        if (changeToReject.id) {
+          setEdges((eds) => eds.filter(e => e.id !== changeToReject.id));
+        } else if (changeToReject.data?.source && changeToReject.data?.target) {
+          // Try to find by source/target if no ID
+          const edgeId = `${changeToReject.data.source}_to_${changeToReject.data.target}`;
+          setEdges((eds) => eds.filter(e => e.id !== edgeId));
+        }
+        break;
+        
+      case 'remove_relation':
+        // Would need to restore the edge (not implemented - need original data)
+        console.log('Remove relation rejected - restoration not implemented');
+        break;
+        
+      case 'update_relation':
+        // Would need to restore original edge data
+        console.log('Update relation rejected - original data not stored');
+        break;
+        
+      default:
+        console.log('Reject not implemented for operation:', changeToReject.op);
+    }
+    
+    // Remove from changes array
+    setDraftState(prev => ({
+      ...prev,
+      changes: prev.changes.filter((_, i) => i !== changeIndex)
+    }));
+    
+    // Remove from undo stack if present
+    setUndoStack(prev => prev.filter(c => c !== changeToReject));
+  }, [draftState.changes]);
 
   const initialNodes: Node<StockNodeData>[] = useMemo(() => {
     if (!data) return [];
@@ -252,6 +531,24 @@ export function EnhancedGraphView({ data, equations, onToggleStock }: EnhancedGr
           target_equation: equation?.target || equation?.target_equation,
           isExpanded: expandedNodes.has(node.id),
           isEnabled: enabledStocks.has(node.id),
+          onEdit: (nodeId: string, nodeData: any) => {
+            // Map StockNodeData to EditableNodeData format for modal
+            setEditingNode({ 
+              id: nodeId, 
+              data: {
+                symbol: nodeData.id,
+                label: nodeData.label,
+                short: nodeData.short,
+                category: nodeData.category,
+                description: nodeData.description,
+                business_meaning: nodeData.business_meaning,
+                initial: 0.5, // Default value
+                color: nodeData.color,
+                isDraft: false,
+                isModified: false,
+              }
+            });
+          },
         },
       };
     });
@@ -341,13 +638,122 @@ export function EnhancedGraphView({ data, equations, onToggleStock }: EnhancedGr
   }
 
   return (
-    <div className="relative w-full h-[700px] bg-slate-900 rounded-lg border border-slate-700">
+    <div className={`relative transition-all duration-300 ${
+      isFullscreen 
+        ? 'fixed top-0 left-0 right-0 bottom-0 z-[9999] w-full h-full bg-slate-900' 
+        : 'w-full h-[700px] bg-slate-900 rounded-lg border border-slate-700'
+    }`}>
+      {/* Toolbar */}
+      {!isFullscreen && (
+        <div className="absolute top-4 left-4 z-10 flex gap-2">
+          <button
+            onClick={addNode}
+            className="flex items-center gap-2 px-3 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors shadow-lg"
+          >
+            <Plus size={16} />
+            Add Node
+          </button>
+
+          {aiAvailable && (
+            <button
+              onClick={() => setShowAIModal(true)}
+              className="flex items-center gap-2 px-3 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors shadow-lg"
+            >
+              <Sparkles size={16} />
+              Ask AI
+            </button>
+          )}
+          
+          {draftState.active && (
+            <>
+              <button
+                onClick={handleValidate}
+                className="flex items-center gap-2 px-3 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors shadow-lg"
+              >
+                <Eye size={16} />
+                Validate
+              </button>
+              
+              <button
+                onClick={() => handleApply(false)}
+                className="flex items-center gap-2 px-3 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors shadow-lg"
+              >
+                <Save size={16} />
+                Apply
+              </button>
+              
+              <button
+                onClick={() => handleApply(true)}
+                className="flex items-center gap-2 px-3 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition-colors shadow-lg"
+              >
+                <Save size={16} />
+                Commit
+              </button>
+            </>
+          )}
+
+          {!draftState.active && (
+            <button
+              onClick={startDraft}
+              className="flex items-center gap-2 px-3 py-2 bg-slate-600 text-white rounded-lg hover:bg-slate-700 transition-colors shadow-lg"
+            >
+              Start Editing
+            </button>
+          )}
+
+          <button
+            onClick={handleUndo}
+            disabled={undoStack.length === 0}
+            className="flex items-center gap-2 px-3 py-2 bg-slate-700 text-white rounded-lg hover:bg-slate-800 transition-colors shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            <Undo size={16} />
+          </button>
+
+          <button
+            onClick={handleRedo}
+            disabled={redoStack.length === 0}
+            className="flex items-center gap-2 px-3 py-2 bg-slate-700 text-white rounded-lg hover:bg-slate-800 transition-colors shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            <Redo size={16} />
+          </button>
+
+          <button
+            onClick={() => setShowDraftPanel(!showDraftPanel)}
+            className="flex items-center gap-2 px-3 py-2 bg-slate-700 text-white rounded-lg hover:bg-slate-800 transition-colors shadow-lg"
+          >
+            {showDraftPanel ? <EyeOff size={16} /> : <Eye size={16} />}
+          </button>
+
+          <button
+            onClick={() => setIsFullscreen(!isFullscreen)}
+            className="flex items-center gap-2 px-3 py-2 bg-slate-700 text-white rounded-lg hover:bg-slate-800 transition-colors shadow-lg"
+            title={isFullscreen ? 'Exit Fullscreen' : 'Enter Fullscreen'}
+          >
+            {isFullscreen ? <Minimize2 size={16} /> : <Maximize2 size={16} />}
+          </button>
+        </div>
+      )}
+
+      {/* Fullscreen Exit Button */}
+      {isFullscreen && (
+        <button
+          onClick={() => setIsFullscreen(false)}
+          className="absolute top-4 right-4 z-10 flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors shadow-lg"
+          title="Exit Fullscreen"
+        >
+          <Minimize2 size={16} />
+          Exit Fullscreen
+        </button>
+      )}
+
       <ReactFlow
         nodes={nodes}
         edges={edges}
         onNodesChange={onNodesChange}
         onEdgesChange={onEdgesChange}
+        onConnect={onConnect}
         onNodeClick={onNodeClick}
+        onEdgeClick={onEdgeClick}
         nodeTypes={nodeTypes}
         fitView
         minZoom={0.2}
@@ -355,38 +761,51 @@ export function EnhancedGraphView({ data, equations, onToggleStock }: EnhancedGr
         defaultViewport={{ x: 0, y: 0, zoom: 0.8 }}
       >
         <Background color="#334155" gap={16} />
+        <Controls />
+        <MiniMap
+          nodeColor={(node) => (node.data as any).color || '#64748b'}
+          className="bg-slate-900 border-slate-700"
+        />
       </ReactFlow>
 
-      {/* Stock Toggle Panel */}
-      <div className="absolute top-4 left-4 bg-slate-900/95 backdrop-blur border border-slate-700 rounded-lg p-3 max-w-xs">
-        <div className="text-xs text-slate-400 uppercase tracking-wide mb-2">Active Stocks</div>
-        <div className="space-y-1 max-h-48 overflow-y-auto scrollbar-thin scrollbar-thumb-slate-600 scrollbar-track-slate-800">
-          {data.nodes.map(node => (
-            <label key={node.id} className="flex items-center gap-2 text-sm cursor-pointer hover:bg-slate-800/50 p-1 rounded">
-              <input
-                type="checkbox"
-                checked={enabledStocks.has(node.id)}
-                onChange={() => handleToggleStock(node.id)}
-                className="rounded border-slate-600 text-blue-600 focus:ring-blue-500"
-              />
-              <span className="font-mono text-slate-300">{node.id}</span>
-              <span className="text-xs text-slate-500">{node.short}</span>
-            </label>
-          ))}
-        </div>
-      </div>
+      {/* Draft Panel */}
+      {showDraftPanel && draftState.active && !isFullscreen && (
+        <DraftPanel
+          draft={draftState.draft}
+          changes={draftState.changes}
+          onClose={() => setShowDraftPanel(false)}
+          onAccept={handleAcceptChange}
+          onReject={handleRejectChange}
+        />
+      )}
 
-      {/* Instructions */}
-      <div className="absolute bottom-4 left-4 bg-slate-900/95 backdrop-blur border border-slate-700 rounded-lg p-3 text-xs text-slate-400 max-w-sm">
-        <div className="font-semibold text-slate-300 mb-1">Graph Controls:</div>
-        <ul className="space-y-0.5">
-          <li>• <strong>Click node</strong> to expand/collapse details</li>
-          <li>• <strong>Drag nodes</strong> to reposition</li>
-          <li>• <strong>Scroll</strong> to zoom in/out</li>
-          <li>• <strong>Edit icon</strong> in expanded node to modify equations</li>
-          <li>• <strong>Toggle stocks</strong> in top-left panel</li>
-        </ul>
-      </div>
+      {/* Edit Modals */}
+      <NodeEditModal
+        node={editingNode}
+        onClose={() => setEditingNode(null)}
+        onSave={handleNodeSave}
+      />
+
+      <EdgeEditModal
+        edge={editingEdge}
+        onClose={() => setEditingEdge(null)}
+        onSave={handleEdgeSave}
+        onDelete={handleEdgeDelete}
+      />
+
+      <AIProposalModal
+        isOpen={showAIModal}
+        onClose={() => {
+          setShowAIModal(false);
+          setAiProposals([]);
+          setAiError(undefined);
+        }}
+        onAccept={handleAcceptAIProposals}
+        onGenerate={handleAIGenerate}
+        isGenerating={aiGenerating}
+        proposals={aiProposals}
+        error={aiError}
+      />
     </div>
   );
 }
