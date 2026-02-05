@@ -1,0 +1,76 @@
+{
+  "draft_id": "draft_20260205_174942",
+  "created_at": "2026-02-05T17:49:42.465200",
+  "based_on_version": null,
+  "description": "Live model editing session",
+  "changes": [
+    {
+      "op": "add_state",
+      "symbol": "C",
+      "id": "state.contractor_pressure",
+      "data": {
+        "category": "governance",
+        "initial_value": 0.5,
+        "description": "Pressure from contractors"
+      },
+      "reason": "Implementing contractor pressure as a new state variable"
+    },
+    {
+      "op": "add_parameter",
+      "symbol": "C",
+      "id": "param.contractor_weight",
+      "data": {
+        "category": "governance",
+        "description": "Weight of contractor pressure on decision-making"
+      },
+      "reason": "Defining contractor weight as a new parameter"
+    },
+    {
+      "op": "add_equation",
+      "symbol": "C",
+      "id": "eq.contractor_pressure_dynamics",
+      "data": {
+        "category": "governance",
+        "equation": "clamp(min(max(p.contractor_weight * p.kT, 0), 1))"
+      },
+      "reason": "Defining dynamics for contractor pressure using a weighted function"
+    },
+    {
+      "op": "update_state",
+      "symbol": "D",
+      "id": null,
+      "data": {
+        "ui": {
+          "x": 311.9452748916673,
+          "y": 39.373942690156994
+        }
+      },
+      "reason": "Node repositioned"
+    },
+    {
+      "op": "update_state",
+      "symbol": "D",
+      "id": null,
+      "data": {
+        "ui": {
+          "x": 304.32526135051125,
+          "y": 183.20169827947632
+        }
+      },
+      "reason": "Node repositioned"
+    },
+    {
+      "op": "update_state",
+      "symbol": "E",
+      "id": null,
+      "data": {
+        "ui": {
+          "x": 40.383828813822305,
+          "y": 2.703118323237586
+        }
+      },
+      "reason": "Node repositioned"
+    }
+  ],
+  "metadata": {}
+}

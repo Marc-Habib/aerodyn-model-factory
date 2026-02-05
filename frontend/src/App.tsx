@@ -272,28 +272,26 @@ function App() {
         </div>
       )}
 
-      <main className="max-w-7xl mx-auto px-4 py-6">
+      <main className="flex h-[calc(100vh-5rem)]">
         {userMode === 'executive' ? (
           /* Executive Mode Layout */
-          <div className="space-y-6">
-            {/* Scenario selector */}
-            <div className="grid grid-cols-3 gap-4">
-              <div className="col-span-2">
-                <ScenarioPanel
-                  scenarios={config?.scenarios || {}}
-                  selected={selectedScenario}
-                  onSelect={handleSelectScenario}
-                  onAdd={handleAddScenario}
-                  onEdit={handleEditScenario}
-                  onDelete={handleDeleteScenario}
-                  onDuplicate={handleDuplicateScenario}
-                />
-              </div>
+          <>
+            {/* Left Sidebar - Scenarios */}
+            <div className="w-80 flex-shrink-0 bg-slate-800/30 border-r border-slate-700 p-4 space-y-4 overflow-y-auto">
+              <ScenarioPanel
+                scenarios={config?.scenarios || {}}
+                selected={selectedScenario}
+                onSelect={handleSelectScenario}
+                onAdd={handleAddScenario}
+                onEdit={handleEditScenario}
+                onDelete={handleDeleteScenario}
+                onDuplicate={handleDuplicateScenario}
+              />
               <div className="flex flex-col gap-3">
                 <button
                   onClick={handleSimulate}
                   disabled={simulating}
-                  className="flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-500 hover:to-blue-600 font-medium transition-all disabled:opacity-50"
+                  className="flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-500 hover:to-blue-600 font-medium transition-all disabled:opacity-50"
                 >
                   {simulating ? <Loader2 size={18} className="animate-spin" /> : <Play size={18} />}
                   Run Simulation
@@ -301,7 +299,7 @@ function App() {
                 <button
                   onClick={handleCompareAll}
                   disabled={simulating}
-                  className="flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-slate-700 hover:bg-slate-600 font-medium transition-all disabled:opacity-50"
+                  className="flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-slate-700 hover:bg-slate-600 font-medium transition-all disabled:opacity-50"
                 >
                   <GitCompare size={18} />
                   Compare All
@@ -309,77 +307,80 @@ function App() {
               </div>
             </div>
 
-            {/* Executive Dashboard or Comparison */}
-            {compareMode && allResults ? (
-              <ScenarioComparison
-                scenarios={Object.entries(allResults).map(([name, result]) => ({ name, result }))}
-              />
-            ) : (
-              <ExecutiveDashboard
-                result={result}
-                scenarioName={selectedScenario || 'No scenario selected'}
-              />
-            )}
+            {/* Main Content Area */}
+            <div className="flex-1 p-6 overflow-y-auto space-y-6">
+              {/* Executive Dashboard or Comparison */}
+              {compareMode && allResults ? (
+                <ScenarioComparison
+                  scenarios={Object.entries(allResults).map(([name, result]) => ({ name, result }))}
+                />
+              ) : (
+                <ExecutiveDashboard
+                  result={result}
+                  scenarioName={selectedScenario || 'No scenario selected'}
+                />
+              )}
 
-            {/* Chart view */}
-            {result && !compareMode && (
-              <div className="bg-slate-800/50 rounded-xl border border-slate-700 p-6" style={{ minHeight: '500px' }}>
-                <h3 className="text-lg font-semibold text-slate-200 mb-4">Detailed Timeline</h3>
-                <SimulationChart result={result} />
-              </div>
-            )}
-          </div>
+              {/* Chart view */}
+              {result && !compareMode && (
+                <div className="bg-slate-800/50 rounded-xl border border-slate-700 p-6" style={{ minHeight: '500px' }}>
+                  <h3 className="text-lg font-semibold text-slate-200 mb-4">Detailed Timeline</h3>
+                  <SimulationChart result={result} />
+                </div>
+              )}
+            </div>
+          </>
         ) : (
           /* Expert Mode Layout */
-          <div className="grid grid-cols-12 gap-6">
-            {/* Left sidebar */}
-            <div className="col-span-4 space-y-6">
-            <ScenarioPanel
-              scenarios={config?.scenarios || {}}
-              selected={selectedScenario}
-              onSelect={handleSelectScenario}
-              onAdd={handleAddScenario}
-              onEdit={handleEditScenario}
-              onDelete={handleDeleteScenario}
-              onDuplicate={handleDuplicateScenario}
-            />
-
-            {config && (
-              <ParameterPanel
-                parameters={config.parameters}
-                states={config.states}
-                paramValues={paramValues}
-                initialValues={initialValues}
-                onParamChange={handleParamChange}
-                onInitialChange={handleInitialChange}
+          <>
+            {/* Left Sidebar */}
+            <div className="w-80 flex-shrink-0 bg-slate-800/30 border-r border-slate-700 p-4 space-y-6 overflow-y-auto">
+              <ScenarioPanel
+                scenarios={config?.scenarios || {}}
+                selected={selectedScenario}
+                onSelect={handleSelectScenario}
+                onAdd={handleAddScenario}
+                onEdit={handleEditScenario}
+                onDelete={handleDeleteScenario}
+                onDuplicate={handleDuplicateScenario}
               />
-            )}
 
-            {/* Action buttons */}
-            <div className="flex gap-3">
-              <button
-                onClick={handleSimulate}
-                disabled={simulating}
-                className="flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 font-medium transition-all disabled:opacity-50"
-              >
-                {simulating ? <Loader2 size={18} className="animate-spin" /> : <Play size={18} />}
-                Simulate
-              </button>
-              <button
-                onClick={handleCompareAll}
-                disabled={simulating}
-                className="flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-slate-700 hover:bg-slate-600 font-medium transition-all disabled:opacity-50"
-              >
-                <GitCompare size={18} />
-                Compare
-              </button>
+              {config && (
+                <ParameterPanel
+                  parameters={config.parameters}
+                  states={config.states}
+                  paramValues={paramValues}
+                  initialValues={initialValues}
+                  onParamChange={handleParamChange}
+                  onInitialChange={handleInitialChange}
+                />
+              )}
+
+              {/* Action buttons */}
+              <div className="flex flex-col gap-3">
+                <button
+                  onClick={handleSimulate}
+                  disabled={simulating}
+                  className="flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 font-medium transition-all disabled:opacity-50"
+                >
+                  {simulating ? <Loader2 size={18} className="animate-spin" /> : <Play size={18} />}
+                  Simulate
+                </button>
+                <button
+                  onClick={handleCompareAll}
+                  disabled={simulating}
+                  className="flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-slate-700 hover:bg-slate-600 font-medium transition-all disabled:opacity-50"
+                >
+                  <GitCompare size={18} />
+                  Compare
+                </button>
+              </div>
             </div>
-          </div>
 
-          {/* Main content area */}
-          <div className="col-span-8 space-y-6">
-            {/* View mode toggle */}
-            <div className="flex gap-2 mb-4 items-center justify-between">
+            {/* Main Content Area */}
+            <div className="flex-1 flex flex-col overflow-hidden">
+              {/* View mode toggle */}
+              <div className="flex gap-2 p-4 items-center justify-between border-b border-slate-700 bg-slate-800/20">
               <div className="flex gap-2">
                 <button
                   onClick={() => { setViewMode('chart'); setEditorMode(false); }}
@@ -414,23 +415,24 @@ function App() {
                   <Code size={16} />
                   Model Editor
                 </button>
+                </div>
+                {viewMode === 'graph' && !editorMode && (
+                  <label className="flex items-center gap-2 text-sm text-slate-400">
+                    <input
+                      type="checkbox"
+                      checked={useEnhancedGraph}
+                      onChange={(e) => setUseEnhancedGraph(e.target.checked)}
+                      className="rounded border-slate-600 text-blue-600 focus:ring-blue-500"
+                    />
+                    Enhanced Graph
+                  </label>
+                )}
               </div>
-              {viewMode === 'graph' && !editorMode && (
-                <label className="flex items-center gap-2 text-sm text-slate-400">
-                  <input
-                    type="checkbox"
-                    checked={useEnhancedGraph}
-                    onChange={(e) => setUseEnhancedGraph(e.target.checked)}
-                    className="rounded border-slate-600 text-blue-600 focus:ring-blue-500"
-                  />
-                  Enhanced Graph
-                </label>
-              )}
-            </div>
 
-            <div className={viewMode === 'graph' && useEnhancedGraph && !editorMode ? '' : editorMode ? '' : 'bg-slate-800/50 rounded-xl p-6 border border-slate-700'}>
-              {editorMode ? (
-                <div className="h-[calc(100vh-12rem)]">
+              {/* Content Area with Border */}
+              <div className={`flex-1 overflow-hidden ${viewMode === 'graph' && useEnhancedGraph && !editorMode ? '' : editorMode ? 'border-l border-slate-700' : 'p-6 bg-slate-800/50 border-l border-slate-700'}`}>
+                {editorMode ? (
+                  <div className="h-full">
                   <GraphEditor
                     modelData={config}
                     onModelUpdate={(effectiveModel) => {
@@ -470,35 +472,13 @@ function App() {
                   <CompareChart results={allResults} stateKey={compareState} />
                 </div>
               ) : (
-                <SimulationChart 
-                  result={result} 
-                  title={selectedScenario ? `Simulation: ${selectedScenario}` : 'Simulation Results'} 
-                />
+                <SimulationChart result={result} />
               )}
+              </div>
             </div>
-
-            {/* Equations Panel - Show all stock equations */}
-            {config && equations && equations.stocks && (
-              <EquationsPanel
-                stocks={config.states}
-                equations={equations.stocks as Record<string, { target: string; derivative: string; explanation: string }>}
-              />
-            )}
-            </div>
-          </div>
+          </>
         )}
       </main>
-
-      {/* Model Context - Only in Expert Mode */}
-      {userMode === 'expert' && modelMeta && (
-        <ModelContext
-          meta={modelMeta}
-          feedbackLoops={feedbackLoops}
-          stockCount={config ? Object.keys(config.states).length : 0}
-          parameterCount={config ? Object.keys(config.parameters).length : 0}
-          scenarioCount={config ? Object.keys(config.scenarios).length : 0}
-        />
-      )}
     </div>
 
       {/* Scenario Modal */}

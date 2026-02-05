@@ -460,11 +460,12 @@ export function GraphEditor({ modelData, onModelUpdate }: GraphEditorProps) {
   return (
     <div className={`relative w-full transition-all duration-300 ${
       isFullscreen 
-        ? 'fixed inset-0 z-50 h-screen' 
+        ? 'fixed inset-0 z-50 h-screen bg-slate-900' 
         : 'h-full'
     }`}>
-      {/* Toolbar */}
-      <div className="absolute top-4 left-4 z-10 flex gap-2">
+      {/* Toolbar - Hidden in fullscreen except exit button */}
+      {!isFullscreen && (
+        <div className="absolute top-4 left-4 z-10 flex gap-2">
         <button
           onClick={addNode}
           className="flex items-center gap-2 px-3 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
@@ -550,7 +551,20 @@ export function GraphEditor({ modelData, onModelUpdate }: GraphEditorProps) {
         >
           {isFullscreen ? <Minimize2 size={16} /> : <Maximize2 size={16} />}
         </button>
-      </div>
+        </div>
+      )}
+
+      {/* Fullscreen Exit Button */}
+      {isFullscreen && (
+        <button
+          onClick={() => setIsFullscreen(false)}
+          className="absolute top-4 right-4 z-10 flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors shadow-lg"
+          title="Exit Fullscreen"
+        >
+          <Minimize2 size={16} />
+          Exit Fullscreen
+        </button>
+      )}
 
       {/* React Flow Canvas */}
       <ReactFlow
