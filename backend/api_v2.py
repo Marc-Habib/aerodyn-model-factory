@@ -12,8 +12,17 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 from models.engine_v2 import ModelEngine
 from backend.draft_api import router as draft_router
+from backend.ai_service import create_ai_service
 
 app = FastAPI(title="AeroDyn API v2", version="2.0.0")
+
+# Initialize AI service
+try:
+    ai_service = create_ai_service()
+    AI_AVAILABLE = ai_service.client.check_health()
+except Exception:
+    AI_AVAILABLE = False
+    ai_service = None
 
 app.add_middleware(
     CORSMiddleware,
@@ -159,6 +168,56 @@ def reload_config():
     global engine
     engine = ModelEngine()
     return {"status": "reloaded", "model": engine.meta["name"]}
+
+
+class AIPatchRequest(BaseModel):
+    prompt: str
+    selected_nodes: Optional[List[str]] = None
+    context: Optional[str] = None
+
+
+@app.post("/ai/generate-patch")
+def generate_ai_patch(request: AIPatchRequest):
+    """
+    Generate a model patch using AI based on natural language prompt.
+    
+    Requires Ollama to be running with llama3.1:8b model.
+    """
+    if not AI_AVAILABLE or ai_service is None:
+        raise HTTPException(
+            status_code=503,
+            detail="AI service not available. Please install Ollama and run: ollama pull llama3.1:8b"
+        )
+    
+    try:
+        # Get current model state
+        current_model = engine.config
+        
+        # Generate patch
+        patch = ai_service.generate_patch(
+            prompt=request.prompt,
+            current_model=current_model,
+            selected_nodes=request.selected_nodes,
+            context=request.context
+        )
+        
+        return {
+            "success": True,
+            "patch": patch,
+            "model_used": ai_service.client.config.model
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"AI generation failed: {str(e)}")
+
+
+@app.get("/ai/status")
+def get_ai_status():
+    """Check if AI service is available."""
+    return {
+        "available": AI_AVAILABLE,
+        "model": ai_service.client.config.model if ai_service else None,
+        "ollama_url": ai_service.client.config.ollama_url if ai_service else None
+    }
 
 
 if __name__ == "__main__":

@@ -24,7 +24,7 @@ import {
 } from '@xyflow/react';
 import type { Node, Edge, Connection, NodeChange } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
-import { Plus, Save, Undo, Redo, Eye, EyeOff } from 'lucide-react';
+import { Plus, Save, Undo, Redo, Eye, EyeOff, Sparkles } from 'lucide-react';
 import { createDraft, addChangeToDraft, validateDraft, applyDraft } from '../api/drafts';
 import type { Draft, PatchChange } from '../api/drafts';
 import { EditableNode } from './EditableNode';
@@ -32,6 +32,8 @@ import type { EditableNodeData } from './EditableNode';
 import { DraftPanel } from './DraftPanel';
 import { NodeEditModal } from './NodeEditModal';
 import { EdgeEditModal } from './EdgeEditModal';
+import { AIProposalModal } from './AIProposalModal';
+import { checkAIStatus, generateAIPatch } from '../api/ai';
 
 interface GraphEditorProps {
   modelData: any;
@@ -61,6 +63,11 @@ export function GraphEditor({ modelData, onModelUpdate }: GraphEditorProps) {
   const [redoStack, setRedoStack] = useState<PatchChange[]>([]);
   const [editingNode, setEditingNode] = useState<{ id: string; data: EditableNodeData } | null>(null);
   const [editingEdge, setEditingEdge] = useState<Edge | null>(null);
+  const [showAIModal, setShowAIModal] = useState(false);
+  const [aiGenerating, setAiGenerating] = useState(false);
+  const [aiProposals, setAiProposals] = useState<PatchChange[]>([]);
+  const [aiError, setAiError] = useState<string>();
+  const [aiAvailable, setAiAvailable] = useState(false);
 
   // Category colors
   const categoryColors: Record<string, string> = {
@@ -70,6 +77,13 @@ export function GraphEditor({ modelData, onModelUpdate }: GraphEditorProps) {
     risk: '#ef4444',
     market: '#f59e0b',
   };
+
+  // Check AI availability
+  useEffect(() => {
+    checkAIStatus()
+      .then(status => setAiAvailable(status.available))
+      .catch(() => setAiAvailable(false));
+  }, []);
 
   // Initialize nodes and edges from model data
   useEffect(() => {
@@ -413,6 +427,34 @@ export function GraphEditor({ modelData, onModelUpdate }: GraphEditorProps) {
     console.log('Redo:', change);
   }, [redoStack]);
 
+  // Handle AI generation
+  const handleAIGenerate = useCallback(async (prompt: string, selectedNodes?: string[]) => {
+    setAiGenerating(true);
+    setAiError(undefined);
+
+    try {
+      const response = await generateAIPatch({
+        prompt,
+        selected_nodes: selectedNodes,
+      });
+
+      setAiProposals(response.patch.changes);
+    } catch (error) {
+      setAiError(error instanceof Error ? error.message : 'AI generation failed');
+    } finally {
+      setAiGenerating(false);
+    }
+  }, []);
+
+  // Handle accepting AI proposals
+  const handleAcceptAIProposals = useCallback(async (changes: PatchChange[]) => {
+    for (const change of changes) {
+      await addChange(change);
+    }
+    setShowAIModal(false);
+    setAiProposals([]);
+  }, [addChange]);
+
   return (
     <div className="relative w-full h-full">
       {/* Toolbar */}
@@ -424,6 +466,16 @@ export function GraphEditor({ modelData, onModelUpdate }: GraphEditorProps) {
           <Plus size={16} />
           Add Node
         </button>
+
+        {aiAvailable && (
+          <button
+            onClick={() => setShowAIModal(true)}
+            className="flex items-center gap-2 px-3 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
+          >
+            <Sparkles size={16} />
+            Ask AI
+          </button>
+        )}
         
         {draftState.active && (
           <>
@@ -529,6 +581,20 @@ export function GraphEditor({ modelData, onModelUpdate }: GraphEditorProps) {
         onClose={() => setEditingEdge(null)}
         onSave={handleEdgeSave}
         onDelete={handleEdgeDelete}
+      />
+
+      <AIProposalModal
+        isOpen={showAIModal}
+        onClose={() => {
+          setShowAIModal(false);
+          setAiProposals([]);
+          setAiError(undefined);
+        }}
+        onAccept={handleAcceptAIProposals}
+        onGenerate={handleAIGenerate}
+        isGenerating={aiGenerating}
+        proposals={aiProposals}
+        error={aiError}
       />
     </div>
   );
