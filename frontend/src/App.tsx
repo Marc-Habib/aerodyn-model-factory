@@ -272,12 +272,12 @@ function App() {
         </div>
       )}
 
-      <main className="flex h-[calc(100vh-5rem)]">
+      <main className="flex h-[calc(100vh-4rem)] max-h-[calc(100vh-4rem)] overflow-hidden">
         {userMode === 'executive' ? (
           /* Executive Mode Layout */
           <>
             {/* Left Sidebar - Scenarios */}
-            <div className="w-80 flex-shrink-0 bg-slate-800/30 border-r border-slate-700 p-4 space-y-4 overflow-y-auto">
+            <div className="w-72 flex-shrink-0 bg-slate-800/30 border-r border-slate-700 p-4 space-y-4 overflow-y-auto max-h-full">
               <ScenarioPanel
                 scenarios={config?.scenarios || {}}
                 selected={selectedScenario}
@@ -308,33 +308,35 @@ function App() {
             </div>
 
             {/* Main Content Area */}
-            <div className="flex-1 p-6 overflow-y-auto space-y-6">
-              {/* Executive Dashboard or Comparison */}
-              {compareMode && allResults ? (
-                <ScenarioComparison
-                  scenarios={Object.entries(allResults).map(([name, result]) => ({ name, result }))}
-                />
-              ) : (
-                <ExecutiveDashboard
-                  result={result}
-                  scenarioName={selectedScenario || 'No scenario selected'}
-                />
-              )}
+            <div className="flex-1 overflow-hidden max-w-full">
+              <div className="h-full overflow-y-auto p-6 max-h-full">
+                {/* Executive Dashboard or Comparison */}
+                {compareMode && allResults ? (
+                  <ScenarioComparison
+                    scenarios={Object.entries(allResults).map(([name, result]) => ({ name, result }))}
+                  />
+                ) : (
+                  <ExecutiveDashboard
+                    result={result}
+                    scenarioName={selectedScenario || 'No scenario selected'}
+                  />
+                )}
 
-              {/* Chart view */}
-              {result && !compareMode && (
-                <div className="bg-slate-800/50 rounded-xl border border-slate-700 p-6" style={{ minHeight: '500px' }}>
-                  <h3 className="text-lg font-semibold text-slate-200 mb-4">Detailed Timeline</h3>
-                  <SimulationChart result={result} />
-                </div>
-              )}
+                {/* Chart view */}
+                {result && !compareMode && (
+                  <div className="bg-slate-800/50 rounded-xl border border-slate-700 p-6 mt-4" style={{ minHeight: '500px' }}>
+                    <h3 className="text-lg font-semibold text-slate-200 mb-4">Detailed Timeline</h3>
+                    <SimulationChart result={result} />
+                  </div>
+                )}
+              </div>
             </div>
           </>
         ) : (
           /* Expert Mode Layout */
           <>
             {/* Left Sidebar */}
-            <div className="w-80 flex-shrink-0 bg-slate-800/30 border-r border-slate-700 p-4 space-y-6 overflow-y-auto">
+            <div className="w-72 flex-shrink-0 bg-slate-800/30 border-r border-slate-700 p-4 space-y-4 overflow-y-auto max-h-full">
               <ScenarioPanel
                 scenarios={config?.scenarios || {}}
                 selected={selectedScenario}
@@ -378,9 +380,9 @@ function App() {
             </div>
 
             {/* Main Content Area */}
-            <div className="flex-1 flex flex-col overflow-hidden">
+            <div className="flex-1 flex flex-col overflow-hidden max-w-full">
               {/* View mode toggle */}
-              <div className="flex gap-2 p-4 items-center justify-between border-b border-slate-700 bg-slate-800/20">
+              <div className="flex gap-2 px-3 py-2 items-center justify-between border-b border-slate-700 bg-slate-800/20">
               <div className="flex gap-2">
                 <button
                   onClick={() => { setViewMode('chart'); setEditorMode(false); }}
@@ -429,10 +431,10 @@ function App() {
                 )}
               </div>
 
-              {/* Content Area with Border */}
-              <div className={`flex-1 overflow-hidden ${viewMode === 'graph' && useEnhancedGraph && !editorMode ? '' : editorMode ? 'border-l border-slate-700' : 'p-6 bg-slate-800/50 border-l border-slate-700'}`}>
+              {/* Content Area - Full Width to Edge */}
+              <div className={`flex-1 overflow-auto max-h-full ${viewMode === 'graph' && useEnhancedGraph && !editorMode ? '' : editorMode ? '' : 'p-6 bg-slate-800/50'}`}>
                 {editorMode ? (
-                  <div className="h-full">
+                  <div className="h-full w-full">
                   <GraphEditor
                     modelData={config}
                     onModelUpdate={(effectiveModel) => {

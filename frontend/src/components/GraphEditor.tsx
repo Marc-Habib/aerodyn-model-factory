@@ -458,10 +458,10 @@ export function GraphEditor({ modelData, onModelUpdate }: GraphEditorProps) {
   }, [addChange]);
 
   return (
-    <div className={`relative w-full transition-all duration-300 ${
+    <div className={`relative transition-all duration-300 ${
       isFullscreen 
-        ? 'fixed inset-0 z-50 h-screen bg-slate-900' 
-        : 'h-full'
+        ? 'fixed top-0 left-0 right-0 bottom-0 z-[9999] w-full h-full bg-slate-900 overflow-hidden' 
+        : 'w-full h-full'
     }`}>
       {/* Toolbar - Hidden in fullscreen except exit button */}
       {!isFullscreen && (
