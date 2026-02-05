@@ -28,7 +28,10 @@ import { Plus, Save, Undo, Redo, Eye, EyeOff } from 'lucide-react';
 import { createDraft, addChangeToDraft, validateDraft, applyDraft } from '../api/drafts';
 import type { Draft, PatchChange } from '../api/drafts';
 import { EditableNode } from './EditableNode';
+import type { EditableNodeData } from './EditableNode';
 import { DraftPanel } from './DraftPanel';
+import { NodeEditModal } from './NodeEditModal';
+import { EdgeEditModal } from './EdgeEditModal';
 
 interface GraphEditorProps {
   modelData: any;
@@ -56,6 +59,8 @@ export function GraphEditor({ modelData, onModelUpdate }: GraphEditorProps) {
   const [showDraftPanel, setShowDraftPanel] = useState(true);
   const [undoStack, setUndoStack] = useState<PatchChange[]>([]);
   const [redoStack, setRedoStack] = useState<PatchChange[]>([]);
+  const [editingNode, setEditingNode] = useState<{ id: string; data: EditableNodeData } | null>(null);
+  const [editingEdge, setEditingEdge] = useState<Edge | null>(null);
 
   // Category colors
   const categoryColors: Record<string, string> = {
@@ -175,6 +180,79 @@ export function GraphEditor({ modelData, onModelUpdate }: GraphEditorProps) {
       }
     });
   }, [onNodesChange, nodes, addChange]);
+
+  // Handle node click to edit
+  const onNodeClick = useCallback((_event: React.MouseEvent, node: Node) => {
+    setEditingNode(node as { id: string; data: EditableNodeData });
+  }, []);
+
+  // Handle edge click to edit
+  const onEdgeClick = useCallback((_event: React.MouseEvent, edge: Edge) => {
+    setEditingEdge(edge);
+  }, []);
+
+  // Handle node save
+  const handleNodeSave = useCallback((nodeId: string, updates: Partial<EditableNodeData>) => {
+    setNodes((nds) =>
+      nds.map((node) =>
+        node.id === nodeId
+          ? { ...node, data: { ...node.data, ...updates, isModified: true } }
+          : node
+      )
+    );
+
+    // Add to draft
+    addChange({
+      op: 'update_state',
+      symbol: nodeId,
+      data: updates,
+      reason: 'Node properties updated'
+    });
+  }, [addChange]);
+
+  // Handle edge save
+  const handleEdgeSave = useCallback((edgeId: string, updates: { coefficient: number; description: string; type: 'positive' | 'negative' }) => {
+    setEdges((eds) =>
+      eds.map((edge) =>
+        edge.id === edgeId
+          ? {
+              ...edge,
+              label: updates.coefficient.toString(),
+              style: {
+                ...edge.style,
+                stroke: updates.type === 'negative' ? '#ef4444' : '#10b981',
+              },
+              markerEnd: {
+                ...edge.markerEnd,
+                color: updates.type === 'negative' ? '#ef4444' : '#10b981',
+              },
+              data: { ...edge.data, ...updates, isModified: true },
+            }
+          : edge
+      )
+    );
+
+    // Add to draft
+    addChange({
+      op: 'update_relation',
+      id: edgeId,
+      data: updates,
+      reason: 'Relation coefficient/description updated'
+    });
+  }, [addChange]);
+
+  // Handle edge delete
+  const handleEdgeDelete = useCallback((edgeId: string) => {
+    setEdges((eds) => eds.filter((edge) => edge.id !== edgeId));
+
+    // Add to draft
+    addChange({
+      op: 'remove_relation',
+      id: edgeId,
+      data: {},
+      reason: 'Relation deleted'
+    });
+  }, [addChange]);
 
   // Handle edge connection
   const onConnect = useCallback((connection: Connection) => {
@@ -415,6 +493,8 @@ export function GraphEditor({ modelData, onModelUpdate }: GraphEditorProps) {
         onNodesChange={handleNodesChange}
         onEdgesChange={onEdgesChange}
         onConnect={onConnect}
+        onNodeClick={onNodeClick}
+        onEdgeClick={onEdgeClick}
         nodeTypes={nodeTypes}
         fitView
         minZoom={0.1}
@@ -436,6 +516,20 @@ export function GraphEditor({ modelData, onModelUpdate }: GraphEditorProps) {
           onClose={() => setShowDraftPanel(false)}
         />
       )}
+
+      {/* Edit Modals */}
+      <NodeEditModal
+        node={editingNode}
+        onClose={() => setEditingNode(null)}
+        onSave={handleNodeSave}
+      />
+
+      <EdgeEditModal
+        edge={editingEdge}
+        onClose={() => setEditingEdge(null)}
+        onSave={handleEdgeSave}
+        onDelete={handleEdgeDelete}
+      />
     </div>
   );
 }
