@@ -1,0 +1,84 @@
+{
+  "_description": "AeroDyn Systems - Equations in new DSL format. Uses p.param_name syntax instead of p['param_name'].",
+  
+  "T": {
+    "id": "eq.targeting",
+    "name": "Targeting Capability",
+    "target_expr": "clamp(p.surveillance_to_targeting * S + 0.2 * R + 0.15 * I + p.data_to_capability * Q + p.ai_boost - p.ethics_constraint * (1 - E), 0, 1)",
+    "rate_expr": "p.kT * (T_target - T)",
+    "description": "Targeting adjusts toward target based on surveillance, resources, integration, data quality, AI boost, constrained by ethics compliance",
+    "notes": "Core capability - drives trust and incidents"
+  },
+  "S": {
+    "id": "eq.surveillance",
+    "name": "Surveillance Coverage",
+    "target_expr": "clamp(0.4 * R + 0.25 * I + 0.15 * T + p.data_to_capability * Q, 0, 1)",
+    "rate_expr": "p.kS * (S_target - S)",
+    "description": "Surveillance depends on resources, integration, targeting feedback, and data quality",
+    "notes": "Feeds targeting and decision support"
+  },
+  "D": {
+    "id": "eq.decision_support",
+    "name": "Decision Support Quality",
+    "target_expr": "clamp(p.targeting_to_decision * T + 0.25 * S + 0.2 * E + 0.15 * V, 0, 1)",
+    "rate_expr": "p.kD * (D_target - D)",
+    "description": "Decision support depends on targeting, surveillance, ethics, and V&V maturity (trust in recommendations)",
+    "notes": "Human-AI teaming effectiveness"
+  },
+  "E": {
+    "id": "eq.ethics",
+    "name": "Ethics Compliance",
+    "target_expr": "clamp(p.political_scrutiny + 0.25 * R + 0.3 * V + 0.2 * X - 0.15 * T, 0, 1)",
+    "rate_expr": "p.kE * (E_target - E)",
+    "description": "Ethics driven by scrutiny, resources, V&V maturity; incidents increase pressure; aggressive targeting draws scrutiny",
+    "notes": "Balancing loop - constrains aggressive capability push"
+  },
+  "R": {
+    "id": "eq.resources",
+    "name": "Resource Capacity",
+    "target_expr": "clamp(p.resource_efficiency + p.trust_to_resources * L + 0.15 * I - 0.1 * (1 - E) - p.vv_investment * V, 0, 1)",
+    "rate_expr": "p.kR * (R_target - R)",
+    "description": "Resources depend on efficiency, trust (procurement), integration; ethics violations and V&V investment cost resources",
+    "notes": "Reinforcing loop - trust drives procurement"
+  },
+  "I": {
+    "id": "eq.integration",
+    "name": "System Integration",
+    "target_expr": "clamp(p.integration_rate + 0.12 * T + 0.12 * S + 0.1 * D + 0.1 * Q - 0.1 * p.export_control_pressure, 0, 1)",
+    "rate_expr": "p.kI * (I_target - I)",
+    "description": "Integration depends on all capabilities and data quality; export controls slow integration",
+    "notes": "Enables capability synergies"
+  },
+  "L": {
+    "id": "eq.trust",
+    "name": "Legitimacy & Trust",
+    "target_expr": "clamp(p.base_trust + 0.25 * E + 0.2 * V + 0.15 * D - p.incident_to_trust * X, 0, 1)",
+    "rate_expr": "p.kL * (L_target - L)",
+    "description": "Trust built by ethics, V&V, decision support quality; eroded by incidents",
+    "notes": "Critical for procurement - reinforcing loop with resources"
+  },
+  "X": {
+    "id": "eq.incidents",
+    "name": "Incident Accumulation",
+    "target_expr": "clamp(p.incident_shock + p.incident_sensitivity * T * (1 - V) * (1 - E) - p.incident_decay * (1 - X), 0, 1)",
+    "rate_expr": "p.kX * (X_target - X)",
+    "description": "Incidents driven by capability push when V&V and ethics are low; decay naturally over time",
+    "notes": "Balancing loop - erodes trust and forces compliance"
+  },
+  "V": {
+    "id": "eq.verification",
+    "name": "V&V Maturity",
+    "target_expr": "clamp(p.vv_investment * R + 0.2 * E + 0.15 * Q, 0, 1)",
+    "rate_expr": "p.kV * (V_target - V)",
+    "description": "V&V maturity depends on resource investment, ethics culture, and data quality",
+    "notes": "Prevents incidents but costs resources"
+  },
+  "Q": {
+    "id": "eq.data_quality",
+    "name": "Data Quality",
+    "target_expr": "clamp(p.data_governance + 0.25 * R + 0.2 * I + 0.15 * E, 0, 1)",
+    "rate_expr": "p.kQ * (Q_target - Q)",
+    "description": "Data quality depends on governance baseline, resources, integration, and ethics (data handling standards)",
+    "notes": "Foundation for all AI capabilities"
+  }
+}

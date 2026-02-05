@@ -5,14 +5,15 @@ FastAPI Backend V2 - Uses new dynamic engine
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
-from typing import Dict, Optional
+from typing import Dict, Optional, Any, List
 import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
 from models.engine_v2 import ModelEngine
+from backend.draft_api import router as draft_router
 
-app = FastAPI(title="AeroDyn Systems API V2", version="2.0.0")
+app = FastAPI(title="AeroDyn API v2", version="2.0.0")
 
 app.add_middleware(
     CORSMiddleware,
@@ -23,6 +24,9 @@ app.add_middleware(
 )
 
 engine = ModelEngine()
+
+# Include draft/patch system router
+app.include_router(draft_router)
 
 
 class SimulationRequest(BaseModel):

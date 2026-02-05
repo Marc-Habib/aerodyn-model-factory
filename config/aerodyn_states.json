@@ -2,93 +2,153 @@
   "_description": "AeroDyn Systems - Stock Variables (State Variables). Each stock represents a normalized [0,1] level.",
   
   "T": {
+    "id": "state.targeting",
     "name": "Targeting Capability",
     "short": "Targeting",
     "category": "capability",
     "description": "AI-enabled targeting accuracy and reliability. Higher values indicate more precise, autonomous targeting systems.",
+    "business_meaning": "How accurate are our AI targeting systems?",
     "initial": 0.3,
     "min": 0.0,
-    "max": 1.0
+    "max": 1.0,
+    "ui": {
+      "x": 200,
+      "y": 100
+    }
   },
   "S": {
+    "id": "state.surveillance",
     "name": "Surveillance Coverage",
     "short": "Surveillance",
     "category": "capability",
     "description": "Sensor network effectiveness and ISR (Intelligence, Surveillance, Reconnaissance) coverage. Feeds targeting and decision support.",
+    "business_meaning": "How comprehensive is our monitoring capability?",
     "initial": 0.4,
     "min": 0.0,
-    "max": 1.0
+    "max": 1.0,
+    "ui": {
+      "x": 100,
+      "y": 200
+    }
   },
   "D": {
+    "id": "state.decision_support",
     "name": "Decision Support Quality",
     "short": "Decision Support",
     "category": "capability",
     "description": "Human-AI teaming effectiveness. Quality of AI recommendations and operator trust in decision support systems.",
+    "business_meaning": "How reliable are AI-generated recommendations?",
     "initial": 0.3,
     "min": 0.0,
-    "max": 1.0
+    "max": 1.0,
+    "ui": {
+      "x": 300,
+      "y": 200
+    }
   },
   "E": {
+    "id": "state.ethics",
     "name": "Ethics Compliance",
     "short": "Ethics",
     "category": "governance",
     "description": "Adherence to ethical guidelines, IHL (International Humanitarian Law), and political constraints. High E constrains aggressive capabilities.",
+    "business_meaning": "Are we meeting ethical AI guidelines?",
     "initial": 0.5,
     "min": 0.0,
-    "max": 1.0
+    "max": 1.0,
+    "ui": {
+      "x": 500,
+      "y": 300
+    }
   },
   "R": {
+    "id": "state.resources",
     "name": "Resource Capacity",
     "short": "Resources",
     "category": "execution",
     "description": "Budget, personnel, and organizational throughput available for development and deployment.",
+    "business_meaning": "Do we have sufficient budget and personnel?",
     "initial": 0.6,
     "min": 0.0,
-    "max": 1.0
+    "max": 1.0,
+    "ui": {
+      "x": 400,
+      "y": 400
+    }
   },
   "I": {
+    "id": "state.integration",
     "name": "System Integration",
     "short": "Integration",
     "category": "execution",
     "description": "Interoperability maturity across platforms, data systems, and allied forces. Enables capability synergies.",
+    "business_meaning": "How well do systems work together?",
     "initial": 0.3,
     "min": 0.0,
-    "max": 1.0
+    "max": 1.0,
+    "ui": {
+      "x": 200,
+      "y": 400
+    }
   },
   "L": {
+    "id": "state.trust",
     "name": "Legitimacy & Trust",
     "short": "Trust",
     "category": "governance",
     "description": "Ministry and public trust in AeroDyn's systems. Drives procurement decisions and political support. Eroded by incidents.",
+    "business_meaning": "Do governments and the public trust us to deliver safe AI weapons?",
     "initial": 0.6,
     "min": 0.0,
-    "max": 1.0
+    "max": 1.0,
+    "ui": {
+      "x": 600,
+      "y": 200
+    }
   },
   "X": {
+    "id": "state.incidents",
     "name": "Incident Accumulation",
     "short": "Incidents",
     "category": "risk",
     "description": "Accumulated adverse events: targeting errors, civilian harm, system failures, data breaches. Decays slowly; spikes damage trust.",
+    "business_meaning": "How many safety failures have occurred?",
     "initial": 0.1,
     "min": 0.0,
-    "max": 1.0
+    "max": 1.0,
+    "ui": {
+      "x": 700,
+      "y": 300
+    }
   },
   "V": {
+    "id": "state.verification",
     "name": "V&V Maturity",
     "short": "Verification",
     "category": "governance",
     "description": "Verification & Validation process maturity. Reduces incident probability; provides compliance evidence; costly in resources.",
+    "business_meaning": "How thorough is our verification & validation?",
     "initial": 0.3,
     "min": 0.0,
-    "max": 1.0
+    "max": 1.0,
+    "ui": {
+      "x": 600,
+      "y": 400
+    }
   },
   "Q": {
+    "id": "state.data_quality",
     "name": "Data Quality",
     "short": "Data",
     "category": "capability",
     "description": "Training data pipeline quality, labeling accuracy, and data governance. Directly impacts AI model performance.",
+    "business_meaning": "How good is our training data?",
     "initial": 0.4,
     "min": 0.0,
-    "max": 1.0
+    "max": 1.0,
+    "ui": {
+      "x": 100,
+      "y": 300
+    }
   }
 }
