@@ -1,0 +1,46 @@
+{
+  "draft_id": "draft_20260205_174612",
+  "created_at": "2026-02-05T17:46:12.510366",
+  "based_on_version": null,
+  "description": "Live model editing session",
+  "changes": [
+    {
+      "op": "update_state",
+      "symbol": "E",
+      "id": null,
+      "data": {
+        "ui": {
+          "x": 67.63343651164902,
+          "y": 175.86673779427002
+        }
+      },
+      "reason": "Node repositioned"
+    },
+    {
+      "op": "update_state",
+      "symbol": "E",
+      "id": null,
+      "data": {
+        "label": "Ethics Compliance",
+        "description": "Adherence to ethical guidelines, IHL (International Humanitarian Law), and political constraints. High E constrains aggressive capabilities.",
+        "business_meaning": "How well do we meet ethical and legal requirements for AI weapons?",
+        "initial": 0.5,
+        "category": "governance"
+      },
+      "reason": "Node properties updated"
+    },
+    {
+      "op": "update_state",
+      "symbol": "E",
+      "id": null,
+      "data": {
+        "ui": {
+          "x": 74.45969308183581,
+          "y": 172.45360950917663
+        }
+      },
+      "reason": "Node repositioned"
+    }
+  ],
+  "metadata": {}
+}
