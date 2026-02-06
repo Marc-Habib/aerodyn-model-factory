@@ -52,12 +52,20 @@ export function EquationEditor({
       deps.stocks = [...new Set(stockMatches)];
     }
 
-    // Extract parameter references (p['param_name'] or p["param_name"])
-    const paramPattern = /p\[['"]([^'"]+)['"]\]/g;
+    // Extract parameter references - support both p.param_name and p['param_name']
+    // New syntax: p.param_name
+    const dotParamPattern = /p\.([a-zA-Z_][a-zA-Z0-9_]*)/g;
     let match;
-    while ((match = paramPattern.exec(localEquation)) !== null) {
+    while ((match = dotParamPattern.exec(localEquation)) !== null) {
       deps.parameters.push(match[1]);
     }
+    
+    // Old syntax: p['param_name'] or p["param_name"]
+    const bracketParamPattern = /p\[['"]([^'"]+)['"]\]/g;
+    while ((match = bracketParamPattern.exec(localEquation)) !== null) {
+      deps.parameters.push(match[1]);
+    }
+    
     deps.parameters = [...new Set(deps.parameters)];
 
     return deps;
@@ -78,7 +86,7 @@ export function EquationEditor({
   };
 
   const insertParameter = (paramKey: string) => {
-    const paramRef = `p['${paramKey}']`;
+    const paramRef = `p.${paramKey}`;
     const before = localEquation.slice(0, cursorPosition);
     const after = localEquation.slice(cursorPosition);
     const newEquation = `${before}${paramRef}${after}`;
@@ -171,16 +179,16 @@ export function EquationEditor({
           </button>
           
           {showParamMenu && (
-            <div className="absolute top-full mt-1 left-0 bg-slate-800 border border-slate-600 rounded-lg shadow-lg z-50 max-h-48 overflow-y-auto min-w-[200px]">
+            <div className="absolute top-full mt-1 left-0 bg-slate-800 border border-slate-600 rounded-lg shadow-lg z-50 max-h-64 overflow-y-auto min-w-[300px]">
               {Object.entries(availableParameters).map(([key, param]) => (
                 <button
                   key={key}
                   type="button"
                   onClick={() => insertParameter(key)}
-                  className="w-full text-left px-3 py-2 text-sm hover:bg-slate-700 transition-colors"
+                  className="w-full text-left px-3 py-2 text-sm hover:bg-slate-700 transition-colors border-b border-slate-700 last:border-b-0"
                 >
-                  <div className="text-slate-200 font-mono">{key}</div>
-                  <div className="text-xs text-slate-400 truncate">{param.description}</div>
+                  <div className="text-slate-200 font-semibold mb-1">{param.description}</div>
+                  <div className="text-xs text-slate-400 font-mono">p.{key}</div>
                 </button>
               ))}
             </div>

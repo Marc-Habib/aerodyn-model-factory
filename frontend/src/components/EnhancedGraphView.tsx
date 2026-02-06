@@ -28,6 +28,7 @@ interface EnhancedGraphViewProps {
   data: GraphData | null;
   equations: { stocks?: Record<string, { name?: string; equation?: string; target_equation?: string; target?: string; derivative?: string; description?: string }> };
   paramOverrides?: Record<string, number>;
+  parameters?: Record<string, { description: string; value: number }>;
   onUpdateEquation?: (stockId: string, field: 'equation' | 'target_equation' | 'description', value: string) => void;
   onToggleStock?: (stockId: string, enabled: boolean) => void;
   modelData?: any;
@@ -192,7 +193,7 @@ const nodeTypes = {
   stockNode: StockNode,
 };
 
-export function EnhancedGraphView({ data, equations, onToggleStock, modelData }: EnhancedGraphViewProps) {
+export function EnhancedGraphView({ data, equations, parameters = {}, onToggleStock, modelData }: EnhancedGraphViewProps) {
   const [expandedNodes, setExpandedNodes] = useState<Set<string>>(new Set());
   const [enabledStocks, setEnabledStocks] = useState<Set<string>>(new Set(data?.nodes.map(n => n.id) || []));
   
@@ -834,12 +835,7 @@ export function EnhancedGraphView({ data, equations, onToggleStock, modelData }:
         onClose={() => setEditingNode(null)}
         onSave={handleNodeSave}
         availableStocks={data?.nodes.map(n => n.id) || []}
-        availableParameters={Object.fromEntries(
-          Object.entries(equations?.stocks || {}).map(([key, val]) => [
-            key,
-            { description: val.description || '', value: 0.5 }
-          ])
-        )}
+        availableParameters={parameters}
       />
 
       <EdgeEditModal

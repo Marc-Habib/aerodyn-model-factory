@@ -416,6 +416,12 @@ function App() {
                     data={graphData}
                     equations={equations as { stocks?: Record<string, { name?: string; equation?: string; target_equation?: string; target?: string; derivative?: string; description?: string }> }}
                     paramOverrides={selectedScenario && config ? config.scenarios[selectedScenario]?.param_overrides : undefined}
+                    parameters={config ? Object.fromEntries(
+                      Object.entries(config.parameters).map(([key, param]) => [
+                        key,
+                        { description: param.description, value: param.value }
+                      ])
+                    ) : {}}
                     modelData={config}
                   />
               ) : compareMode && allResults ? (
