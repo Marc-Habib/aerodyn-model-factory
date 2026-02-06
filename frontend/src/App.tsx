@@ -3,16 +3,12 @@ import { Play, RefreshCw, GitCompare, Loader2, Network, BarChart3, Briefcase, Co
 import { ScenarioPanel } from './components/ScenarioPanel';
 import { ParameterPanel } from './components/ParameterPanel';
 import { SimulationChart, CompareChart } from './components/Chart';
-import { GraphView } from './components/GraphView';
 import { EnhancedGraphView } from './components/EnhancedGraphView';
-import { GraphEditor } from './components/GraphEditor';
 import { ScenarioModal } from './components/ScenarioModal';
 import { ExecutiveDashboard } from './components/ExecutiveDashboard';
 import { ScenarioComparison } from './components/ScenarioComparison';
-import { ModelContext } from './components/ModelContext';
-import { EquationsPanel } from './components/EquationsPanel';
-import type { FullConfig, SimulationResult, Scenario, GraphData, ModelMeta, FeedbackLoop } from './api';
-import { fetchConfig, simulate, simulateAll, reloadConfig, fetchGraph, fetchEquations, saveScenario, fetchModelMeta, fetchFeedbackLoops } from './api';
+import type { FullConfig, SimulationResult, Scenario, GraphData } from './api';
+import { fetchConfig, simulate, simulateAll, reloadConfig, fetchGraph, fetchEquations, saveScenario } from './api';
 
 function App() {
   const [config, setConfig] = useState<FullConfig | null>(null);
@@ -31,26 +27,20 @@ function App() {
   const [graphData, setGraphData] = useState<GraphData | null>(null);
   const [equations, setEquations] = useState<Record<string, unknown> | null>(null);
   const [viewMode, setViewMode] = useState<'chart' | 'graph'>('chart');
-  const [useEnhancedGraph, setUseEnhancedGraph] = useState(true);
-  const [editorMode, setEditorMode] = useState(false);
   const [userMode, setUserMode] = useState<'executive' | 'expert'>('executive');
-  const [modelMeta, setModelMeta] = useState<ModelMeta | null>(null);
-  const [feedbackLoops, setFeedbackLoops] = useState<FeedbackLoop[]>([]);
   
   // Modal state
   const [modalOpen, setModalOpen] = useState(false);
   const [modalMode, setModalMode] = useState<'create' | 'edit'>('create');
   const [editingScenario, setEditingScenario] = useState<Scenario | null>(null);
 
-  // Load config, graph, equations, model meta, and feedback loops on mount
+  // Load config, graph, and equations on mount
   useEffect(() => {
-    Promise.all([fetchConfig(), fetchGraph(), fetchEquations(), fetchModelMeta(), fetchFeedbackLoops()])
-      .then(([cfg, graph, eqs, meta, loops]) => {
+    Promise.all([fetchConfig(), fetchGraph(), fetchEquations()])
+      .then(([cfg, graph, eqs]) => {
         setConfig(cfg);
         setGraphData(graph);
         setEquations(eqs);
-        setModelMeta(meta);
-        setFeedbackLoops(loops);
         if (Object.keys(cfg.scenarios).length > 0) {
           const first = Object.keys(cfg.scenarios)[0];
           setSelectedScenario(first);
