@@ -583,6 +583,7 @@ export function EnhancedGraphView({ data, equations, parameters = {}, onToggleSt
           isEnabled: enabledStocks.has(node.id),
           onEdit: (nodeId: string, nodeData: any) => {
             // Map StockNodeData to EditableNodeData format for modal
+            // Include equations so they appear in the edit modal
             setEditingNode({ 
               id: nodeId, 
               data: {
@@ -596,7 +597,10 @@ export function EnhancedGraphView({ data, equations, parameters = {}, onToggleSt
                 color: nodeData.color,
                 isDraft: false,
                 isModified: false,
-              }
+                // Include existing equations from node data
+                equation: nodeData.equation,
+                target_equation: nodeData.target_equation,
+              } as any
             });
           },
         },
