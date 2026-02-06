@@ -172,28 +172,74 @@ Example operations:
         selected_nodes: List[str] = None,
         context: str = None
     ) -> str:
-        """Build user prompt with model context"""
+        """Build user prompt with rich model context for dynamic modifications"""
         
-        # Extract current states
+        # Extract current states with details
         states = current_model.get("states", {})
         state_list = ", ".join(states.keys())
         
+        # Build detailed state information
+        state_details = []
+        for symbol, state in list(states.items())[:10]:  # Limit to 10 for token efficiency
+            state_details.append(f"  {symbol}: {state.get('name', 'N/A')} ({state.get('category', 'N/A')})")
+        state_details_str = "\n".join(state_details) if state_details else "  (none)"
+        
+        # Extract equations with details
+        equations = current_model.get("equations", {})
+        equation_details = []
+        for symbol, eq in list(equations.items())[:10]:  # Limit to 10 for token efficiency
+            target = eq.get("target_expr", eq.get("target", "N/A"))
+            rate = eq.get("rate_expr", eq.get("derivative", "N/A"))
+            equation_details.append(f"  {symbol}: target={target[:60]}..., rate={rate[:60]}...")
+        equation_details_str = "\n".join(equation_details) if equation_details else "  (none)"
+        
+        # Extract relations with details
+        relations = current_model.get("relations", [])
+        # Handle case where relations might be nested in dict
+        if isinstance(relations, dict):
+            relations = relations.get("relations", [])
+        
+        relation_details = []
+        for rel in relations[:15]:  # Limit to 15 for token efficiency
+            if isinstance(rel, dict):
+                source = rel.get("source", "?")
+                target = rel.get("target", "?")
+                desc = rel.get("description", "")[:40]
+                relation_details.append(f"  {source} → {target}: {desc}")
+        relation_details_str = "\n".join(relation_details) if relation_details else "  (none)"
+        
         # Extract current parameters
         params = current_model.get("parameters", {})
-        param_list = ", ".join(params.keys())
+        param_list = ", ".join(list(params.keys())[:20])  # Limit to 20 for readability
         
         # Build context section
         context_section = ""
         if selected_nodes:
-            context_section = f"\nSelected nodes for context: {', '.join(selected_nodes)}"
+            context_section = f"\n\nSelected nodes for context: {', '.join(selected_nodes)}"
+            # Add detailed info for selected nodes
+            for node in selected_nodes:
+                if node in equations:
+                    eq = equations[node]
+                    context_section += f"\n  {node} equations:"
+                    context_section += f"\n    target: {eq.get('target_expr', eq.get('target', 'N/A'))}"
+                    context_section += f"\n    rate: {eq.get('rate_expr', eq.get('derivative', 'N/A'))}"
         if context:
-            context_section += f"\nAdditional context: {context}"
+            context_section += f"\n\nAdditional context: {context}"
         
-        # Build prompt
+        # Build comprehensive prompt
         user_prompt = f"""Current model state:
-- Existing states: {state_list}
-- Existing parameters: {param_list}
-- Number of relations: {len(current_model.get('relations', []))}
+
+STATES ({len(states)} total):
+{state_details_str}
+
+EQUATIONS ({len(equations)} total):
+{equation_details_str}
+
+RELATIONS ({len(relations)} total):
+{relation_details_str}
+
+PARAMETERS ({len(params)} total):
+{param_list}
 {context_section}
 
 User request: {prompt}
