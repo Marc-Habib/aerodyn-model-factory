@@ -38,6 +38,10 @@ export function NodeEditModal({ node, onClose, onSave, availableStocks = [], ava
 
   useEffect(() => {
     if (node) {
+      console.log('NodeEditModal received node data:', node.data);
+      console.log('Target equation:', (node.data as any).target_equation);
+      console.log('Derivative equation:', (node.data as any).equation);
+      
       setName(node.data.label);
       setDescription(node.data.description);
       setBusinessMeaning(node.data.business_meaning);
