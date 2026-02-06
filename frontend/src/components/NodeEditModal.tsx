@@ -7,6 +7,7 @@
 import { useState, useEffect } from 'react';
 import { X, Save } from 'lucide-react';
 import type { EditableNodeData } from './EditableNode';
+import { EquationEditor, type EquationDependencies } from './EquationEditor';
 
 interface NodeEditModalProps {
   node: {
@@ -14,15 +15,24 @@ interface NodeEditModalProps {
     data: EditableNodeData;
   } | null;
   onClose: () => void;
-  onSave: (nodeId: string, updates: Partial<EditableNodeData>) => void;
+  onSave: (nodeId: string, updates: Partial<EditableNodeData>, dependencies?: {
+    target: EquationDependencies;
+    derivative: EquationDependencies;
+  }) => void;
+  availableStocks?: string[];
+  availableParameters?: Record<string, { description: string; value: number }>;
 }
 
-export function NodeEditModal({ node, onClose, onSave }: NodeEditModalProps) {
+export function NodeEditModal({ node, onClose, onSave, availableStocks = [], availableParameters = {} }: NodeEditModalProps) {
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
   const [businessMeaning, setBusinessMeaning] = useState('');
   const [initial, setInitial] = useState(0.5);
   const [category, setCategory] = useState('capability');
+  const [targetEquation, setTargetEquation] = useState('');
+  const [derivativeEquation, setDerivativeEquation] = useState('');
+  const [targetDeps, setTargetDeps] = useState<EquationDependencies>({ stocks: [], parameters: [] });
+  const [derivativeDeps, setDerivativeDeps] = useState<EquationDependencies>({ stocks: [], parameters: [] });
   const [validating, setValidating] = useState(false);
   const [errors, setErrors] = useState<string[]>([]);
 
@@ -33,6 +43,9 @@ export function NodeEditModal({ node, onClose, onSave }: NodeEditModalProps) {
       setBusinessMeaning(node.data.business_meaning);
       setInitial(node.data.initial);
       setCategory(node.data.category);
+      // Initialize equations if available (from StockNodeData)
+      setTargetEquation((node.data as any).target_equation || '');
+      setDerivativeEquation((node.data as any).equation || '');
     }
   }, [node]);
 
@@ -53,13 +66,16 @@ export function NodeEditModal({ node, onClose, onSave }: NodeEditModalProps) {
       return;
     }
 
-    // Save updates
+    // Save updates with equations and dependencies
     onSave(node.id, {
       label: name,
       description,
       business_meaning: businessMeaning,
       initial,
       category,
+    }, {
+      target: targetDeps,
+      derivative: derivativeDeps,
     });
 
     setValidating(false);
@@ -158,6 +174,36 @@ export function NodeEditModal({ node, onClose, onSave }: NodeEditModalProps) {
               rows={3}
               className="w-full bg-slate-800 border border-slate-600 rounded-lg px-4 py-2 text-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
               placeholder="Technical description of this state variable..."
+            />
+          </div>
+
+          {/* Target Equation */}
+          <div>
+            <EquationEditor
+              equation={targetEquation}
+              onChange={(eq, deps) => {
+                setTargetEquation(eq);
+                setTargetDeps(deps);
+              }}
+              availableStocks={availableStocks}
+              availableParameters={availableParameters}
+              label="Target Equation"
+              placeholder="e.g., clamp(p['surveillance_to_targeting'] * S + 0.2 * R, 0, 1)"
+            />
+          </div>
+
+          {/* Derivative Equation */}
+          <div>
+            <EquationEditor
+              equation={derivativeEquation}
+              onChange={(eq, deps) => {
+                setDerivativeEquation(eq);
+                setDerivativeDeps(deps);
+              }}
+              availableStocks={availableStocks}
+              availableParameters={availableParameters}
+              label="Derivative (d/dt)"
+              placeholder="e.g., p['kT'] * (target - current)"
             />
           </div>
 

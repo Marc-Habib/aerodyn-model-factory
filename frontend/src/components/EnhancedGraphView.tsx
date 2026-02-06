@@ -338,12 +338,61 @@ export function EnhancedGraphView({ data, equations, onToggleStock, modelData }:
   }, [addChange]);
 
   // Node/Edge handlers
-  const handleNodeSave = useCallback((nodeId: string, updates: any) => {
+  const handleNodeSave = useCallback((nodeId: string, updates: any, dependencies?: {
+    target: { stocks: string[]; parameters: string[] };
+    derivative: { stocks: string[]; parameters: string[] };
+  }) => {
+    // Update node data
     setNodes((nds) =>
       nds.map((node) =>
         node.id === nodeId ? { ...node, data: { ...node.data, ...updates } } : node
       )
     );
+    
+    // Auto-generate edges from equation dependencies
+    if (dependencies) {
+      const allDependentStocks = [...new Set([...dependencies.target.stocks, ...dependencies.derivative.stocks])];
+      
+      // Remove old edges from this node
+      setEdges((eds) => eds.filter((edge) => edge.target !== nodeId || !edge.id.includes('auto_')));
+      
+      // Create new edges for each dependent stock
+      allDependentStocks.forEach((sourceStock) => {
+        if (sourceStock !== nodeId) { // Don't create self-loops
+          const edgeId = `auto_${sourceStock}_to_${nodeId}`;
+          setEdges((eds) => {
+            // Check if edge already exists
+            if (eds.some(e => e.id === edgeId)) return eds;
+            
+            return [...eds, {
+              id: edgeId,
+              source: sourceStock,
+              target: nodeId,
+              animated: true,
+              style: { stroke: '#64748b', strokeWidth: 2 },
+              markerEnd: { type: MarkerType.ArrowClosed, color: '#64748b', width: 20, height: 20 },
+              label: 'auto',
+              labelStyle: { fill: '#94a3b8', fontSize: 10 },
+              labelBgStyle: { fill: '#0f172a' },
+            }];
+          });
+          
+          // Add change for new relation
+          addChange({
+            op: 'add_relation',
+            id: edgeId,
+            data: {
+              source: sourceStock,
+              target: nodeId,
+              type: 'positive',
+              description: `Auto-generated from equation dependency`
+            },
+            reason: 'Auto-generated relation from equation'
+          });
+        }
+      });
+    }
+    
     addChange({
       op: 'update_state',
       symbol: nodeId,
@@ -784,6 +833,13 @@ export function EnhancedGraphView({ data, equations, onToggleStock, modelData }:
         node={editingNode}
         onClose={() => setEditingNode(null)}
         onSave={handleNodeSave}
+        availableStocks={data?.nodes.map(n => n.id) || []}
+        availableParameters={Object.fromEntries(
+          Object.entries(equations?.stocks || {}).map(([key, val]) => [
+            key,
+            { description: val.description || '', value: 0.5 }
+          ])
+        )}
       />
 
       <EdgeEditModal

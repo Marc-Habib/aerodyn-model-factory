@@ -277,7 +277,7 @@ function App() {
           /* Executive Mode Layout */
           <>
             {/* Left Sidebar - Scenarios */}
-            <div className="w-72 flex-shrink-0 bg-slate-800/30 border-r border-slate-700 p-4 space-y-4 overflow-y-auto max-h-full">
+            <div className="w-80 flex-shrink-0 bg-slate-800/30 border-r border-slate-700 p-4 space-y-4 overflow-y-auto max-h-full">
               <ScenarioPanel
                 scenarios={config?.scenarios || {}}
                 selected={selectedScenario}
@@ -336,7 +336,7 @@ function App() {
           /* Expert Mode Layout */
           <>
             {/* Left Sidebar */}
-            <div className="w-72 flex-shrink-0 bg-slate-800/30 border-r border-slate-700 p-4 space-y-4 overflow-y-auto max-h-full">
+            <div className="w-80 flex-shrink-0 bg-slate-800/30 border-r border-slate-700 p-4 space-y-4 overflow-y-auto max-h-full">
               <ScenarioPanel
                 scenarios={config?.scenarios || {}}
                 selected={selectedScenario}
